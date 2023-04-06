@@ -67,10 +67,12 @@ plt.xlabel('Stroke (0=No, 1=Yes)')
 plt.ylabel('Count')
 plt.show()
 
+
 # # Plot a scatterplot of the age and bmi variables by stroke
 # sns.scatterplot(x='age', y='bmi', hue='stroke', data=df)
 # plt.title('Age and BMI by Stroke')
 # plt.xlabel('Age')
 # plt.ylabel('BMI')
 # plt.show()
+
 

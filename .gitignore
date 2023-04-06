@@ -1,0 +1,4 @@
+
+*.xml
+.idea/Stroke-Prediction.iml
+.DS_Store
