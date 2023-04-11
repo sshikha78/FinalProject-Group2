@@ -30,6 +30,7 @@ print(df.dtypes)
 for col in df.columns:
   if df[col].dtype != 'float64':
     print(f"{col} has unique values:{df[col].unique()}")
+
 #Filling Null Data
 #We will fill the null values of bmi column with the mean of this column
 df['bmi'].fillna(value=df['bmi'].mean(),inplace=True)
@@ -58,6 +59,7 @@ plt.title('Age Distribution')
 plt.xlabel('Age')
 plt.ylabel('Frequency')
 plt.show()
+
 #Residence Type, Average Glucose Level, BMI, and Smoking Status
 
 # Plot a bar chart of the stroke variable
