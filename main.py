@@ -126,4 +126,47 @@ plt.xlabel('BMI')
 plt.ylabel('Frequency')
 plt.show()
 
-#testing git
+#EDA by Sanjana
+#
+#Heat map
+sns.heatmap(df.corr())
+
+#Correlation plot
+df.corr()
+
+#Stacked Histogram of Gender and Stroke
+sns.histplot(data=df, x='gender',hue='stroke',
+    multiple="stack",
+    palette="rocket",
+    edgecolor=".3",
+    linewidth=.5)
+
+#Stacked Histogram of hypertension and Stroke
+sns.histplot(data=df, x='hypertension',hue='stroke',
+    bins=[-0.5, 0.5, 1.5], 
+    discrete=True,
+    multiple="stack",
+    palette="rocket",
+    edgecolor=".3",
+    linewidth=.5)
+plt.xticks([0, 1])
+plt.show()
+
+#Stacked Histogram of Work type and Stroke
+sns.histplot(data=df, x='work_type',hue='stroke',
+    multiple="stack",
+    palette="rocket",
+    edgecolor=".3",
+    linewidth=.5)
+
+#Box Plot of hypertension vs age
+sns.boxplot(x='hypertension', y='age', data=df)
+plt.show()
+
+#Scatter plot of Hypertention vs age
+sns.scatterplot(x='age', y='hypertension', data=df)
+plt.show()
+
+#Pair plot for age, avg glucose level, bmi and stroke
+sns.pairplot(df[['age', 'avg_glucose_level', 'bmi', 'stroke']])
+plt.show()
