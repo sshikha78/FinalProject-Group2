@@ -1,3 +1,4 @@
+#%%
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
@@ -170,3 +171,99 @@ plt.show()
 #Pair plot for age, avg glucose level, bmi and stroke
 sns.pairplot(df[['age', 'avg_glucose_level', 'bmi', 'stroke']])
 plt.show()
+
+
+#%% 
+# EDA by Aaron
+# I am focusing on the variables age, heart disease, and married
+variables = ['age', 'heart_disease', 'ever_married', 'stroke']
+
+for variable in variables:
+    print(variable, df[variable].isnull().values.any())
+    print(variable, df[variable].dtype)
+    print()
+# For my variables there are no null values
+# Plotting age hist
+plt.hist(df['age'], bins=20)
+plt.xlabel('Age')
+plt.ylabel('Frequency')
+plt.title('Age Distribution')
+plt.show()
+
+# Plotting age hist strokes
+plt.hist(df[df['stroke'] == 1]['age'], bins=20)
+plt.xlabel('Age')
+plt.ylabel('Frequency')
+plt.title('Age Distribution for Stroke Cases')
+plt.show()
+
+# Plotting heart disease bar chart
+heart_disease_counts = df['heart_disease'].value_counts()
+plt.bar(heart_disease_counts.index, heart_disease_counts.values)
+plt.xticks([0, 1], ['No Heart Disease', 'Heart Disease'])
+plt.ylabel('Count')
+plt.title('Heart Disease Distribution')
+plt.show()
+
+# Plotting heart disease bar chart for strokes
+heart_disease_counts = df[df['stroke'] == 1]['heart_disease'].value_counts()
+plt.bar(heart_disease_counts.index, heart_disease_counts.values)
+plt.xticks([0, 1], ['No Heart Disease', 'Heart Disease'])
+plt.ylabel('Count')
+plt.title('Heart Disease Distribution for Stroke Cases')
+plt.show()
+
+# Plotting age vs heart disease for strokes
+plt.scatter(df[df['stroke'] == 1]['age'], df[df['stroke'] == 1]['heart_disease'],
+            label='Stroke', color='red', alpha=0.5)
+plt.xlabel('Age')
+plt.ylabel('Heart Disease')
+plt.title('Age vs Heart Disease for Stroke Cases')
+plt.legend()
+plt.show()
+
+# Plotting ever married pie chart
+fig = plt.figure(facecolor='white')
+ever_married_counts = df['ever_married'].value_counts()
+plt.pie(ever_married_counts.values, labels=ever_married_counts.index, autopct='%1.1f%%')
+plt.title('Ever Married Distribution')
+plt.show()
+
+# Plotting ever married pie chart for strokes
+fig = plt.figure(facecolor='white')
+ever_married_counts = df[df['stroke'] == 1]['ever_married'].value_counts()
+plt.pie(ever_married_counts.values, labels=ever_married_counts.index, autopct='%1.1f%%')
+plt.title('Ever Married Distribution for Stroke Cases')
+plt.show()
+
+# Plotting age vs ever married for strokes
+plt.scatter(df[df['stroke'] == 1]['age'], df[df['stroke'] == 1]['ever_married'],
+            label='Stroke', color='red', alpha=0.5)
+plt.xlabel('Age')
+plt.ylabel('Ever Married')
+plt.title('Age vs Ever Married for Stroke Cases')
+plt.legend()
+plt.show()
+
+# Plotting ever married vs heart disease for strokes
+ever_married_counts = df[df['stroke'] == 1]['ever_married'].value_counts()
+heart_disease_counts = df[df['stroke'] == 1]['heart_disease'].value_counts()
+plt.bar(['Not Ever Married, No Heart Disease', 'Not Ever Married, Heart Disease',
+         'Ever Married, No Heart Disease', 'Ever Married, Heart Disease'],
+        [df[(df['ever_married'] == 'No') & (df['heart_disease'] == 0) & (df['stroke'] == 1)].shape[0],
+         df[(df['ever_married'] == 'No') & (df['heart_disease'] == 1) & (df['stroke'] == 1)].shape[0],
+         df[(df['ever_married'] == 'Yes') & (df['heart_disease'] == 0) & (df['stroke'] == 1)].shape[0],
+         df[(df['ever_married'] == 'Yes') & (df['heart_disease'] == 1) & (df['stroke'] == 1)].shape[0]],
+        color=['green', 'red', 'purple', 'blue'], alpha=0.5)
+plt.ylabel('Count')
+plt.title('Ever Married vs Heart Disease Distribution for Stroke Cases')
+plt.xticks(rotation=45)
+plt.show()
+
+fig = plt.figure(facecolor='white')
+stroke_counts = df['stroke'].value_counts()
+plt.pie(stroke_counts.values, labels=stroke_counts.index, autopct='%1.1f%%')
+plt.title('Stroke Cases Distribution')
+plt.show()
+
+# %%

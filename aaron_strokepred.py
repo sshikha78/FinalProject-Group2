@@ -10,6 +10,7 @@ from sklearn.preprocessing import LabelEncoder, StandardScaler
 # %%
 # Load Stroke Preciction Dataset
 stroke = pd.read_csv('healthcare-dataset-stroke-data.csv')
+stroke_full_variables = stroke.drop('id', axis=1)
 stroke.head()
 # %%
 # I am focusing on the variables age, heart disease, and married
@@ -30,10 +31,15 @@ plt.title('Age Distribution')
 plt.show()
 
 # Plotting age histogram for strokes
-plt.hist(stroke[stroke['stroke'] == 1]['age'], bins=20)
+plt.hist(stroke[stroke['stroke'] == 1]['age'],bins=20)
 plt.xlabel('Age')
 plt.ylabel('Frequency')
 plt.title('Age Distribution for Stroke Cases')
+plt.show()
+
+#%%
+sns.kdeplot(data=stroke, x='age', hue='stroke', common_norm=False, fill=True, alpha=0.5)
+plt.title('Density Chart of Age with Stroke as Hue')
 plt.show()
 
 
@@ -116,7 +122,11 @@ plt.title('Stroke Cases Distribution')
 plt.show()
 
 
-
+#%%
+corr_matrix = stroke_full_variables.corr()
+sns.heatmap(corr_matrix, annot=True, cmap='coolwarm', square=True)
+plt.title('Correlation Plot')
+plt.show()
 # %%
 # Preprocessing
 print(stroke.head(5))
@@ -143,3 +153,5 @@ X_train_scaled = scaler.fit_transform(X_train)
 X_test_scaled = scaler.transform(X_test)
 
 # %%
+
+
