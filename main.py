@@ -163,6 +163,7 @@ sns.histplot(data=df, x='work_type',hue='stroke',
 sns.boxplot(x='hypertension', y='age', data=df)
 plt.show()
 
+
 #Scatter plot of Hypertention vs age
 sns.scatterplot(x='age', y='hypertension', data=df)
 plt.show()
