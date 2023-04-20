@@ -132,6 +132,7 @@ plt.show()
 print(stroke.head(5))
 stroke = stroke.sample(frac=1, random_state=42).reset_index(drop=True)
 print(stroke.head(5))
+stroke['bmi'].fillna(value=stroke['bmi'].mean(),inplace=True)
 # Perform label encoding for categorical variables
 le = LabelEncoder()
 stroke['gender'] = le.fit_transform(stroke['gender'])
@@ -153,5 +154,41 @@ X_train_scaled = scaler.fit_transform(X_train)
 X_test_scaled = scaler.transform(X_test)
 
 # %%
+# Neural Network
+from sklearn.neural_network import MLPClassifier
+
+# Neural network model
+mlp = MLPClassifier(hidden_layer_sizes=(50,50), max_iter=500)
+mlp.fit(X_train_scaled, y_train)
 
 
+# %%
+y_pred = mlp.predict(X_test_scaled)
+from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_score
+
+# Model evaluation
+print('Accuracy:', accuracy_score(y_test, y_pred))
+print('Precision:', precision_score(y_test, y_pred))
+print('Recall:', recall_score(y_test, y_pred))
+print('F1-score:', f1_score(y_test, y_pred))
+#%%
+from sklearn.metrics import roc_curve, auc
+import matplotlib.pyplot as plt
+# Calculate the false positive rate, true positive rate and thresholds
+fpr, tpr, thresholds = roc_curve(y_test, y_pred)
+
+# Calculate the AUC score
+roc_auc = auc(fpr, tpr)
+
+# Plot the ROC curve
+plt.plot(fpr, tpr, color='darkorange', lw=2, label='ROC curve (area = %0.2f)' % roc_auc)
+plt.plot([0, 1], [0, 1], color='navy', lw=2, linestyle='--')
+plt.xlim([0.0, 1.0])
+plt.ylim([0.0, 1.05])
+plt.xlabel('False Positive Rate')
+plt.ylabel('True Positive Rate')
+plt.title('Receiver Operating Characteristic')
+plt.legend(loc="lower right")
+plt.show()
+
+# %%
