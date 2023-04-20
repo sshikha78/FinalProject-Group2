@@ -127,6 +127,26 @@ plt.xlabel('BMI')
 plt.ylabel('Frequency')
 plt.show()
 
+# # Checking Outliers Using Box -Plot - for BMI, AVG Glucose Level
+fig, axs = plt.subplots(1, 2, figsize=(12, 8))
+sns.boxplot(x='bmi', data=df, ax=axs[0])
+axs[0].set_title('BMI Distribution')
+sns.boxplot(x='avg_glucose_level', data=df, ax=axs[1])
+axs[1].set_title('Average Glucose Level Distribution')
+plt.tight_layout()
+plt.show()
+
+# Methods for treating outliers in the BMI variable
+df['bmi'] = np.log(df['bmi'])
+
+# Re-plot the box plot for BMI to confirm outlier treatment
+sns.boxplot(x=df['bmi'])
+plt.title('BMI Box Plot (after Log)')
+plt.xlabel('BMI')
+plt.show()
+
+
+
 #EDA by Sanjana
 #
 #Heat map
@@ -163,6 +183,7 @@ sns.histplot(data=df, x='work_type',hue='stroke',
 #Box Plot of hypertension vs age
 sns.boxplot(x='hypertension', y='age', data=df)
 plt.show()
+
 
 #Scatter plot of Hypertention vs age
 sns.scatterplot(x='age', y='hypertension', data=df)
