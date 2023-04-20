@@ -3,6 +3,24 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import seaborn as sns
 import os
+from imblearn.over_sampling import SMOTE
+import imblearn
+from sklearn.neighbors import KNeighborsClassifier
+from xgboost import XGBClassifier
+from collections import Counter
+from imblearn.over_sampling import SMOTE
+from imblearn.under_sampling import RandomUnderSampler
+from imblearn.pipeline import Pipeline
+from sklearn.model_selection import train_test_split
+from sklearn.linear_model import LogisticRegression
+from sklearn.metrics import accuracy_score, confusion_matrix
+from sklearn.ensemble import RandomForestClassifier
+from sklearn.metrics import classification_report, confusion_matrix
+from sklearn.svm import SVC
+from sklearn.model_selection import train_test_split
+from sklearn.preprocessing import StandardScaler
+from sklearn.ensemble import GradientBoostingClassifier
+from sklearn.preprocessing import LabelEncoder
 
 # Load the dataset into a pandas DataFrame
 df = pd.read_csv("healthcare-dataset-stroke-data.csv")
@@ -191,3 +209,28 @@ plt.show()
 #Pair plot for age, avg glucose level, bmi and stroke
 sns.pairplot(df[['age', 'avg_glucose_level', 'bmi', 'stroke']])
 plt.show()
+
+
+# Label Encoding
+categorical_col=['gender','ever_married','work_type','Residence_type','smoking_status']
+le = LabelEncoder()
+for col in categorical_col:
+  df[col] = le.fit_transform(df[col])
+
+for col in df.columns:
+  if df[col].dtype != 'float64':
+    print(f"{col} has unique values:{df[col].unique()}")
+
+print(df.head().to_string())
+
+## Feature Engineering:
+over = SMOTE(sampling_strategy=1)
+under = RandomUnderSampler(sampling_strategy=0.1)
+
+features = df.loc[:, :'smoking_status']
+target = df['stroke']
+steps = [('under', under), ('over', over)]
+pipeline = Pipeline(steps=steps)
+features, target = pipeline.fit_resample(features, target)
+
+print(Counter(target))
