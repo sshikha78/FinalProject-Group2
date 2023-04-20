@@ -141,10 +141,14 @@ stroke['work_type'] = le.fit_transform(stroke['work_type'])
 stroke['Residence_type'] = le.fit_transform(stroke['Residence_type'])
 stroke['smoking_status'] = le.fit_transform(stroke['smoking_status'])
 
-
 X = stroke.drop('stroke', axis=1)
 y = stroke['stroke']
+#%%
+from imblearn.over_sampling import SMOTE
 
+smote = SMOTE(random_state=42)
+X, y = smote.fit_resample(X, y)
+#%%
 # Split the data into training and testing sets
 X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
 
@@ -158,7 +162,7 @@ X_test_scaled = scaler.transform(X_test)
 from sklearn.neural_network import MLPClassifier
 
 # Neural network model
-mlp = MLPClassifier(hidden_layer_sizes=(50,50), max_iter=500)
+mlp = MLPClassifier(hidden_layer_sizes=(50,50), max_iter=1000)
 mlp.fit(X_train_scaled, y_train)
 
 
