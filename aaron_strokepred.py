@@ -134,13 +134,13 @@ stroke = stroke.sample(frac=1, random_state=42).reset_index(drop=True)
 print(stroke.head(5))
 stroke['bmi'].fillna(value=stroke['bmi'].mean(),inplace=True)
 # Perform label encoding for categorical variables
-le = LabelEncoder()
-stroke['gender'] = le.fit_transform(stroke['gender'])
-stroke['ever_married'] = le.fit_transform(stroke['ever_married'])
-stroke['work_type'] = le.fit_transform(stroke['work_type'])
-stroke['Residence_type'] = le.fit_transform(stroke['Residence_type'])
-stroke['smoking_status'] = le.fit_transform(stroke['smoking_status'])
-
+# le = LabelEncoder()
+# stroke['gender'] = le.fit_transform(stroke['gender'])
+# stroke['ever_married'] = le.fit_transform(stroke['ever_married'])
+# stroke['work_type'] = le.fit_transform(stroke['work_type'])
+# stroke['Residence_type'] = le.fit_transform(stroke['Residence_type'])
+# stroke['smoking_status'] = le.fit_transform(stroke['smoking_status'])
+stroke = pd.get_dummies(stroke, columns=['gender', 'ever_married', 'work_type', 'Residence_type', 'smoking_status'])
 X = stroke.drop('stroke', axis=1)
 y = stroke['stroke']
 #%%
@@ -148,24 +148,38 @@ from imblearn.over_sampling import SMOTE
 
 smote = SMOTE(random_state=42)
 X, y = smote.fit_resample(X, y)
+
 #%%
 # Split the data into training and testing sets
-X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.3, random_state=42)
 
 # Perform feature scaling using StandardScaler
 scaler = StandardScaler()
 X_train_scaled = scaler.fit_transform(X_train)
 X_test_scaled = scaler.transform(X_test)
-
+#%%
+mlp_gs = MLPClassifier(max_iter=200)
+parameter_space = {
+    'hidden_layer_sizes': [(10,30,10),(20,),(10,10),(5,)],
+    'activation': ['tanh', 'relu', 'logistic'],
+    'solver': ['sgd', 'adam', 'lbfgs'],
+    'alpha': [0.0001, 0.05, 0.01, 0.001],
+    'learning_rate': ['constant','adaptive'],
+}
+from sklearn.model_selection import GridSearchCV
+clf = GridSearchCV(mlp_gs, parameter_space, n_jobs=-1, cv=5)
+clf.fit(X_train_scaled, y_train) # X is train samples and y is the corresponding labels
+#%%
+print('Best parameters found:\n', clf.best_params_)
 # %%
 # Neural Network
 from sklearn.neural_network import MLPClassifier
-
 # Neural network model
-mlp = MLPClassifier(hidden_layer_sizes=(50,50), max_iter=1000)
+# mlp = MLPClassifier(hidden_layer_sizes=(50,50), max_iter=1000)
+mlp = MLPClassifier(hidden_layer_sizes=(20,), activation='tanh',learning_rate='adaptive',max_iter=100)
 mlp.fit(X_train_scaled, y_train)
-
-
+plt.plot(mlp.loss_curve_)
+plt.show()
 # %%
 y_pred = mlp.predict(X_test_scaled)
 from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_score
