@@ -234,3 +234,52 @@ pipeline = Pipeline(steps=steps)
 features, target = pipeline.fit_resample(features, target)
 
 print(Counter(target))
+
+
+# SPLIT TEST AND TRAIN PART
+X_train, X_test, y_train, y_test = train_test_split(features,
+                                                    target, test_size=0.2, random_state=42)
+
+# MACHINE LEARNING ALGORITHMS
+
+
+# RANDOM FOREST
+rfc = RandomForestClassifier(random_state=42)
+rfc.fit(X_train, y_train)
+y_pred = rfc.predict(X_test)
+print("random-forest confusion matrix \n",confusion_matrix(y_test, y_pred))
+print("random-forest Classification report \n",classification_report(y_test, y_pred))
+
+# SVM
+scaler = StandardScaler()
+X_train = scaler.fit_transform(X_train)
+X_test = scaler.transform(X_test)
+svm = SVC(random_state=42)
+svm.fit(X_train, y_train)
+y_pred = svm.predict(X_test)
+print("SVM confusion matrix-\n",confusion_matrix(y_test, y_pred))
+print("SVM Classification report-\n",classification_report(y_test, y_pred))
+
+# Gradient Boosting Classifier
+
+gbc = GradientBoostingClassifier(random_state=42)
+# Fit the model to the training data
+gbc.fit(X_train, y_train)
+# Use the model to make predictions on the testing data
+y_pred = gbc.predict(X_test)
+print("Gradient Boosting Classifier confusion matrix- \n",confusion_matrix(y_test, y_pred))
+print("Gradient Boosting Classifier Classification report \n",classification_report(y_test, y_pred))
+
+
+# XGBOOST
+xgb = XGBClassifier()
+# Train the classifier on the training data
+xgb.fit(X_train, y_train)
+# Make predictions on the testing data
+y_pred = xgb.predict(X_test)
+# Evaluate the accuracy of the model
+accuracy = accuracy_score(y_test, y_pred)
+print("XGBOOST confusion matrix- \n",confusion_matrix(y_test, y_pred))
+print("XGBOOST Classification report  \n",classification_report(y_test, y_pred))
+print("Accuracy-XGBOOST\n:", accuracy)
+
