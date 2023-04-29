@@ -2,6 +2,7 @@ import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
 import seaborn as sns
+from sklearn.metrics import roc_auc_score, roc_curve
 import os
 from imblearn.over_sampling import SMOTE
 import imblearn
@@ -21,6 +22,8 @@ from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import StandardScaler
 from sklearn.ensemble import GradientBoostingClassifier
 from sklearn.preprocessing import LabelEncoder
+from sklearn.metrics import accuracy_score, confusion_matrix, classification_report
+
 
 # Load the dataset into a pandas DataFrame
 df = pd.read_csv("healthcare-dataset-stroke-data.csv")
@@ -248,18 +251,21 @@ X_train, X_test, y_train, y_test = train_test_split(features,
 rfc = RandomForestClassifier(random_state=42)
 rfc.fit(X_train, y_train)
 y_pred = rfc.predict(X_test)
+accuracy = accuracy_score(y_test, y_pred)
 print("random-forest confusion matrix \n",confusion_matrix(y_test, y_pred))
 print("random-forest Classification report \n",classification_report(y_test, y_pred))
+print("Accuracy-Random-forest\n:", accuracy)
+y_pred_proba = rfc.predict_proba(X_test)[:, 1]
+auc = roc_auc_score(y_test, y_pred_proba)
+print("AUC:", auc)
+fpr, tpr, thresholds = roc_curve(y_test, y_pred_proba)
+plt.plot(fpr, tpr, label='Random Forest (AUC = %0.2f)' % auc)
+plt.xlabel('False Positive Rate')
+plt.ylabel('True Positive Rate')
+plt.title('ROC Curves')
+plt.legend(loc='best')
+plt.show()
 
-# SVM
-scaler = StandardScaler()
-X_train = scaler.fit_transform(X_train)
-X_test = scaler.transform(X_test)
-svm = SVC(random_state=42)
-svm.fit(X_train, y_train)
-y_pred = svm.predict(X_test)
-print("SVM confusion matrix-\n",confusion_matrix(y_test, y_pred))
-print("SVM Classification report-\n",classification_report(y_test, y_pred))
 
 # Gradient Boosting Classifier
 
@@ -268,9 +274,20 @@ gbc = GradientBoostingClassifier(random_state=42)
 gbc.fit(X_train, y_train)
 # Use the model to make predictions on the testing data
 y_pred = gbc.predict(X_test)
+accuracy = accuracy_score(y_test, y_pred)
+print("Accuracy-Gradient Boosting Classifier\n:", accuracy)
 print("Gradient Boosting Classifier confusion matrix- \n",confusion_matrix(y_test, y_pred))
 print("Gradient Boosting Classifier Classification report \n",classification_report(y_test, y_pred))
-
+y_pred_proba = gbc.predict_proba(X_test)[:, 1]
+auc = roc_auc_score(y_test, y_pred_proba)
+print("AUC:", auc)
+fpr, tpr, thresholds = roc_curve(y_test, y_pred_proba)
+plt.plot(fpr, tpr, label='Gradient Boosting Classifier (AUC = %0.2f)' % auc)
+plt.xlabel('False Positive Rate')
+plt.ylabel('True Positive Rate')
+plt.title('ROC Curves')
+plt.legend(loc='best')
+plt.show()
 
 # XGBOOST
 xgb = XGBClassifier()
@@ -283,5 +300,17 @@ accuracy = accuracy_score(y_test, y_pred)
 print("XGBOOST confusion matrix- \n",confusion_matrix(y_test, y_pred))
 print("XGBOOST Classification report  \n",classification_report(y_test, y_pred))
 print("Accuracy-XGBOOST\n:", accuracy)
-
+y_pred_proba = xgb.predict_proba(X_test)[:, 1]
+# Calculate the AUC score for the XGBoost classifier
+auc = roc_auc_score(y_test, y_pred_proba)
+print("AUC:", auc)
+# Calculate the false positive rate and true positive rate for various thresholds
+fpr, tpr, thresholds = roc_curve(y_test, y_pred_proba)
+# Plot the ROC curve
+plt.plot(fpr, tpr, label='XGBoost (AUC = %0.2f)' % auc)
+plt.xlabel('False Positive Rate')
+plt.ylabel('True Positive Rate')
+plt.title('ROC Curves')
+plt.legend(loc='best')
+plt.show()
 
