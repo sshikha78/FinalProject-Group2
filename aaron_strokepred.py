@@ -163,14 +163,21 @@ X_test_scaled = scaler.transform(X_test)
 # Neural Network
 from sklearn.neural_network import MLPClassifier
 # Neural network model
-mlp = MLPClassifier(max_iter=200)
+mlp = MLPClassifier(max_iter=1000, random_state=1)
 parameter_space = {
-    'hidden_layer_sizes': [(20,5),(5,),(10,),(50,5),(30,17),(30,15),(30,10), (35,10),(20,20)],
+    'hidden_layer_sizes': [(30,5)],
     'activation': ['logistic', 'tanh', 'relu'],
     'solver': ['sgd', 'adam', 'lbfgs'],
-    'alpha': [0.9, 0.99, 0.1, 0.0001, 0.05, 0.5],
+    'alpha': [0.9],
     'learning_rate': ['constant','adaptive', 'learning'],
 }
+# parameter_space = {
+#     'hidden_layer_sizes': [(20,5),(5,),(10,),(50,5),(30,17),(30,15),(30,10), (35,10),(20,20)],
+#     'activation': ['logistic', 'tanh', 'relu'],
+#     'solver': ['sgd', 'adam', 'lbfgs'],
+#     'alpha': [0.9, 0.99, 0.1, 0.0001, 0.05, 0.5],
+#     'learning_rate': ['constant','adaptive', 'learning'],
+# }
 from sklearn.model_selection import GridSearchCV
 clf = GridSearchCV(mlp, parameter_space, n_jobs=-1, cv=5)
 clf.fit(X_train_scaled, y_train)
@@ -213,20 +220,18 @@ plt.show()
 # %%
 # Keras Model
 from keras.models import Sequential
-from keras.layers import Dense, Dropout
-from keras.callbacks import EarlyStopping
-from keras import regularizers
+from keras.layers import Dense
 
 # Define the model architecture
 model = Sequential()
-model.add(Dense(30, input_dim=X_train_scaled.shape[1], activation='relu', kernel_regularizer=regularizers.l2(0.0)))
-model.add(Dropout(0.0))
+model.add(Dense(30, input_dim=X_train_scaled.shape[1], activation='relu'))
 model.add(Dense(1, activation='sigmoid'))
+
 
 # Compile the model
 model.compile(loss='binary_crossentropy', optimizer='adam', metrics=['accuracy'])
 # Train the model
-history = model.fit(X_train_scaled, y_train, validation_data=(X_test_scaled, y_test), epochs=100)
+history = model.fit(X_train_scaled, y_train, validation_data=(X_test_scaled, y_test), epochs=300)
 
 # Evaluate the model
 loss, accuracy = model.evaluate(X_test_scaled, y_test)
@@ -269,4 +274,4 @@ print(f'Accuracy: {accuracy_score(y_test, y_pred_keras_binary):.3f}')
 print(f'Precision: {precision_score(y_test, y_pred_keras_binary):.3f}')
 print(f'Recall: {recall_score(y_test, y_pred_keras_binary):.3f}')
 print(f'F1-score: {f1_score(y_test, y_pred_keras_binary):.3f}')
-# %%
+
