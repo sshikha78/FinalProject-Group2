@@ -236,6 +236,7 @@ features, target = pipeline.fit_resample(features, target)
 print(Counter(target))
 
 
+
 # SPLIT TEST AND TRAIN PART
 X_train, X_test, y_train, y_test = train_test_split(features,
                                                     target, test_size=0.2, random_state=42)
@@ -282,4 +283,5 @@ accuracy = accuracy_score(y_test, y_pred)
 print("XGBOOST confusion matrix- \n",confusion_matrix(y_test, y_pred))
 print("XGBOOST Classification report  \n",classification_report(y_test, y_pred))
 print("Accuracy-XGBOOST\n:", accuracy)
+
 
