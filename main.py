@@ -314,3 +314,117 @@ plt.title('ROC Curves')
 plt.legend(loc='best')
 plt.show()
 
+# Perform feature scaling using StandardScaler for MLPClassifer and Keras
+scaler = StandardScaler()
+scaler.fit(X_train)
+X_train_scaled = scaler.fit_transform(X_train)
+X_test_scaled = scaler.transform(X_test)
+
+
+# Neural Network
+from sklearn.neural_network import MLPClassifier
+# Neural network model
+mlp = MLPClassifier(max_iter=1000, random_state=1)
+parameter_space = {
+    'hidden_layer_sizes': [(30,5)],
+    'activation': ['logistic', 'tanh', 'relu'],
+    'solver': ['sgd', 'adam', 'lbfgs'],
+    'alpha': [0.9],
+    'learning_rate': ['constant','adaptive', 'learning'],
+}
+# experimented with these parameters below
+# parameter_space = {
+#     'hidden_layer_sizes': [(20,5),(5,),(10,),(50,5),(30,17),(30,15),(30,10), (35,10),(20,20)],
+#     'activation': ['logistic', 'tanh', 'relu'],
+#     'solver': ['sgd', 'adam', 'lbfgs'],
+#     'alpha': [0.9, 0.99, 0.1, 0.0001, 0.05, 0.5],
+#     'learning_rate': ['constant','adaptive', 'learning'],
+# }
+
+# GridSearch to find best parameters
+from sklearn.model_selection import GridSearchCV
+clf = GridSearchCV(mlp, parameter_space, n_jobs=-1, cv=5)
+clf.fit(X_train_scaled, y_train)
+train_acc = clf.score(X_train_scaled, y_train)
+test_acc = clf.score(X_test_scaled, y_test)
+
+print(f'Train accuracy: {train_acc:.3f}')
+print(f'Test accuracy: {test_acc:.3f}')
+print('Best parameters found:\n', clf.best_params_)
+
+y_pred = clf.predict(X_test_scaled)
+from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_score
+# Model evaluation
+print(f'Accuracy: {accuracy_score(y_test, y_pred):.3f}')
+print(f'Precision: {precision_score(y_test, y_pred):.3f}')
+print(f'Recall: {recall_score(y_test, y_pred):.3f}')
+print(f'F1-score: {f1_score(y_test, y_pred):.3f}')
+#  ROC AUC Metric
+from sklearn.metrics import roc_curve, auc
+import matplotlib.pyplot as plt
+fpr, tpr, thresholds = roc_curve(y_test, y_pred)
+# Calculate the AUC score
+roc_auc = auc(fpr, tpr)
+# Plot the ROC curve
+plt.plot(fpr, tpr, color='darkorange', lw=2, label='ROC curve (area = %0.2f)' % roc_auc)
+plt.plot([0, 1], [0, 1], color='navy', lw=2, linestyle='--')
+plt.xlim([0.0, 1.0])
+plt.ylim([0.0, 1.05])
+plt.xlabel('False Positive Rate')
+plt.ylabel('True Positive Rate')
+plt.title('Receiver Operating Characteristic')
+plt.legend(loc="lower right")
+plt.show()
+
+
+# Keras Model
+from keras.models import Sequential
+from keras.layers import Dense
+
+# model architecture - simple model
+model = Sequential()
+model.add(Dense(30, input_dim=X_train_scaled.shape[1], activation='relu'))
+model.add(Dense(1, activation='sigmoid'))
+model.compile(loss='binary_crossentropy', optimizer='adam', metrics=['accuracy'])
+# Train the model
+history = model.fit(X_train_scaled, y_train, validation_data=(X_test_scaled, y_test), epochs=300)
+# Evaluate the model
+loss, accuracy = model.evaluate(X_test_scaled, y_test)
+print(f'Test loss: {loss:.3f}')
+print(f'Test accuracy: {accuracy:.3f}')
+# Plot the accuracy and loss curves for each epoch
+plt.plot(history.history['accuracy'], label='training accuracy')
+plt.plot(history.history['val_accuracy'], label='validation accuracy')
+plt.plot(history.history['loss'], label='training loss')
+plt.plot(history.history['val_loss'], label='validation loss')
+plt.title('Training and validation accuracy and loss')
+plt.xlabel('Epoch')
+plt.ylabel('Accuracy/Loss')
+plt.legend()
+plt.show()
+
+# Predict probabilities for test set
+from sklearn.metrics import auc
+y_pred_keras = model.predict(X_test_scaled)
+fpr_keras, tpr_keras, thresholds_keras = roc_curve(y_test, y_pred_keras)
+auc_keras = auc(fpr_keras, tpr_keras)
+
+# Calculate ROC curve and AUC score
+fpr, tpr, thresholds = roc_curve(y_test, y_pred_keras)
+roc_auc = auc(fpr, tpr)
+# Plot ROC curve
+plt.plot(fpr, tpr, color='darkorange', lw=2, label=f'AUC = {roc_auc:.2f}')
+plt.plot([0, 1], [0, 1], color='navy', lw=2, linestyle='--')
+plt.xlabel('False Positive Rate')
+plt.ylabel('True Positive Rate')
+plt.title('ROC Curve')
+plt.legend(loc='lower right')
+plt.show()
+
+# Model evaluation
+y_pred_keras_binary = (y_pred_keras > 0.5).astype(int) # threshold at 0.5
+print(f'Accuracy: {accuracy_score(y_test, y_pred_keras_binary):.3f}')
+print(f'Precision: {precision_score(y_test, y_pred_keras_binary):.3f}')
+print(f'Recall: {recall_score(y_test, y_pred_keras_binary):.3f}')
+print(f'F1-score: {f1_score(y_test, y_pred_keras_binary):.3f}')
+
