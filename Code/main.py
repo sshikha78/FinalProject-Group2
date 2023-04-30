@@ -270,9 +270,26 @@ plt.xticks([0, 1])
 plt.xlabel("Stroke(0=No,1=Yes)")
 plt.ylabel("Count")
 plt.show()
+unique, counts = np.unique(y, return_counts=True)
 
+# Print the count of instances in each class before oversampling
+print("Class counts before SMOTE oversampling:")
+for i in range(len(unique)):
+    print("Class", unique[i], ":", counts[i])
+
+# Apply SMOTE oversampling
 smote = SMOTE(random_state=42)
 X, y = smote.fit_resample(X, y)
+
+# Count the number of instances in each class after oversampling
+unique, counts = np.unique(y, return_counts=True)
+
+# Print the count of instances in each class after oversampling
+print("Class counts after SMOTE oversampling:")
+for i in range(len(unique)):
+    print("Class", unique[i], ":", counts[i])
+
+
 
 plt.figure(figsize=(10, 5))
 plt.title("Class Distribution after SMOTE")
