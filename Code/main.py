@@ -385,9 +385,7 @@ plt.show()
 
 #%%
 #Feature Reduction
-df.drop('gender_0', axis=1, inplace=True)
-df.drop('gender_1', axis=1, inplace=True)
-df.drop('gender_2', axis=1, inplace=True)
+df.drop('gender', axis=1, inplace=True)
 df.drop('avg_glucose_level', axis=1, inplace=True)
 
 
@@ -486,6 +484,24 @@ plot_confusion_matrix(xgb, X_test_scaled, y_test, cmap='Blues')
 plt.title('XGBOOST Confusion Matrix')
 plot_roc_curve(xgb, X_test_scaled, y_test)
 plt.title('XGBOOST ROC Curve')
+
+#%%
+#Cross Validation
+
+#Random Forest
+rfc = RandomForestClassifier(random_state=42)
+rfc_scores = cross_val_score(rfc, X_train_scaled, y_train, cv=10)
+print('Random Forest Accuracy:', rfc_scores.mean())
+
+#Gradient Boosting Classifier
+gbc = GradientBoostingClassifier(random_state=42)
+gbc_scores = cross_val_score(gbc, X_train_scaled, y_train, cv=10)
+print('Gradient Boosting Classifier Accuracy:', gbc_scores.mean())
+
+# Support Vector Machine
+xgb = XGBClassifier()
+xgb_scores = cross_val_score(xgb, X_train_scaled, y_train, cv=10)
+print('XGBoost Accuracy:', xgb_scores.mean())
 
 #%%
 # Neural Network
