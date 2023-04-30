@@ -227,23 +227,31 @@ for col in df.columns:
 print(df.head().to_string())
 
 ## Feature Engineering:
-over = SMOTE(sampling_strategy=1)
-under = RandomUnderSampler(sampling_strategy=0.1)
+# over = SMOTE(sampling_strategy=1)
+# under = RandomUnderSampler(sampling_strategy=0.1)
 
-features = df.loc[:, :'smoking_status']
-target = df['stroke']
-steps = [('under', under), ('over', over)]
-pipeline = Pipeline(steps=steps)
-features, target = pipeline.fit_resample(features, target)
+# features = df.loc[:, :'smoking_status']
+# target = df['stroke']
+# steps = [('under', under), ('over', over)]
+# pipeline = Pipeline(steps=steps)
+# features, target = pipeline.fit_resample(features, target)
 
-print(Counter(target))
+# print(Counter(target))
 
 
 
-# SPLIT TEST AND TRAIN PART
-X_train, X_test, y_train, y_test = train_test_split(features,
-                                                    target, test_size=0.2, random_state=42)
-
+# # SPLIT TEST AND TRAIN PART
+# X_train, X_test, y_train, y_test = train_test_split(features,
+#                                                     target, test_size=0.2, random_state=42)
+# Encode categorical variables
+df = pd.get_dummies(df, columns=['gender', 'ever_married', 'work_type', 'Residence_type', 'smoking_status'])
+## Feature Engineering:
+X = df.drop(['stroke'], axis=1)
+y = df['stroke']
+smote = SMOTE(random_state=42)
+X, y = smote.fit_resample(X, y)
+# # SPLIT TEST AND TRAIN PART
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
 # MACHINE LEARNING ALGORITHMS
 
 
