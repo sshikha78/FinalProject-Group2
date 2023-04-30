@@ -660,28 +660,4 @@ plt.title('SVM Confusion Matrix')
 plot_roc_curve(svm, X_test_scaled, y_test)
 plt.title('SVM ROC Curve')
 
-
-from sklearn.tree import DecisionTreeClassifier
-from sklearn.ensemble import GradientBoostingClassifier
-from sklearn.naive_bayes import GaussianNB
-
-# Decision Tree
-dt = DecisionTreeClassifier(random_state=42)
-dt.fit(X_train_scaled, y_train)
-dt_score = dt.score(X_test_scaled, y_test)
-print('Decision Tree Accuracy:', dt_score)
-
-# Gradient Boosting
-gb = GradientBoostingClassifier(random_state=42)
-gb.fit(X_train_scaled, y_train)
-gb_score = gb.score(X_test_scaled, y_test)
-print('Gradient Boosting Accuracy:', gb_score)
-
-# Naive Bayes
-nb = GaussianNB()
-nb.fit(X_train_scaled, y_train)
-nb_score = nb.score(X_test_scaled, y_test)
-print('Naive Bayes Accuracy:', nb_score)
-
-
 # %%
