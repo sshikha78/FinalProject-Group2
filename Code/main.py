@@ -73,7 +73,7 @@ plt.title('Stroke Counts')
 plt.xlabel('Stroke (0=No, 1=Yes)')
 plt.ylabel('Count')
 plt.show()
-
+#
 # Smoking status Analysis
 print("Value of count of smoking status-\n",df['smoking_status'].value_counts())
 
@@ -172,10 +172,10 @@ plt.show()
 
 
 
-#EDA by Sanjana
-
-
-
+# #EDA by Sanjana
+#
+#
+#
 #Stacked Histogram of Gender and Stroke
 sns.histplot(data=df, x='gender',hue='stroke',
     multiple="stack",
@@ -239,30 +239,51 @@ plt.show()
 correlation = df.corr()
 print(correlation)
 
-## Feature Engineering:
-# over = SMOTE(sampling_strategy=1)
-# under = RandomUnderSampler(sampling_strategy=0.1)
-
-# features = df.loc[:, :'smoking_status']
-# target = df['stroke']
-# steps = [('under', under), ('over', over)]
-# pipeline = Pipeline(steps=steps)
-# features, target = pipeline.fit_resample(features, target)
-
-# print(Counter(target))
-
-
-
+# ## Feature Engineering:
+# # over = SMOTE(sampling_strategy=1)
+# # under = RandomUnderSampler(sampling_strategy=0.1)
+#
+# # features = df.loc[:, :'smoking_status']
+# # target = df['stroke']
+# # steps = [('under', under), ('over', over)]
+# # pipeline = Pipeline(steps=steps)
+# # features, target = pipeline.fit_resample(features, target)
+#
+# # print(Counter(target))
+#
+#
+#
 # # SPLIT TEST AND TRAIN PART
 # X_train, X_test, y_train, y_test = train_test_split(features,
 #                                                     target, test_size=0.2, random_state=42)
 # Encode categorical variables
 df = pd.get_dummies(df, columns=['gender', 'ever_married', 'work_type', 'Residence_type', 'smoking_status'])
 ## Feature Engineering:
+
 X = df.drop(['stroke'], axis=1)
 y = df['stroke']
+
+plt.figure(figsize=(10, 5))
+plt.title("Class Distribution before SMOTE")
+plt.hist(y, bins=2, rwidth=0.8)
+plt.xticks([0, 1])
+plt.xlabel("Stroke(0=No,1=Yes)")
+plt.ylabel("Count")
+plt.show()
+
 smote = SMOTE(random_state=42)
 X, y = smote.fit_resample(X, y)
+
+plt.figure(figsize=(10, 5))
+plt.title("Class Distribution after SMOTE")
+plt.hist(y, bins=2, rwidth=0.8)
+plt.xticks([0, 1])
+plt.xlabel("Stroke(0=No,1=Yes)")
+plt.ylabel("Count")
+plt.legend()
+plt.show()
+
+
 # # SPLIT TEST AND TRAIN PART
 X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
 # MACHINE LEARNING ALGORITHMS
