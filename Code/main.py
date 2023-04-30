@@ -3,6 +3,7 @@ import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
 import seaborn as sns
+from sklearn.model_selection import cross_val_score
 from sklearn.metrics import roc_auc_score, roc_curve
 import os
 from imblearn.over_sampling import SMOTE
@@ -305,17 +306,27 @@ plt.show()
 
 #%%
 
-# Label Encoding
-categorical_col=['gender','ever_married','work_type','Residence_type','smoking_status']
-le = LabelEncoder()
-for col in categorical_col:
-  df[col] = le.fit_transform(df[col])
+# # Label Encoding
+# categorical_col=['gender','ever_married','work_type','Residence_type','smoking_status']
+# le = LabelEncoder()
+# for col in categorical_col:
+#   df[col] = le.fit_transform(df[col])
+#
+# for col in df.columns:
+#   if df[col].dtype != 'float64':
+#     print(f"{col} has unique values:{df[col].unique()}")
+#
+# print(df.head().to_string())
 
-for col in df.columns:
-  if df[col].dtype != 'float64':
-    print(f"{col} has unique values:{df[col].unique()}")
 
-print(df.head().to_string())
+
+#%%
+
+# Encode categorical variables
+df = pd.get_dummies(df, columns=['gender', 'ever_married', 'work_type', 'Residence_type', 'smoking_status'])
+# Feature Engineering:
+X = df.drop(['stroke'], axis=1)
+y = df['stroke']
 
 # HeatMap
 plt.figure(figsize=(10,8))
@@ -327,13 +338,9 @@ plt.show()
 correlation = df.corr()
 print(correlation)
 
-#%%
+# # SPLIT TEST AND TRAIN PART
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
 
-# Encode categorical variables
-df = pd.get_dummies(df, columns=['gender', 'ever_married', 'work_type', 'Residence_type', 'smoking_status'])
-# Feature Engineering:
-X = df.drop(['stroke'], axis=1)
-y = df['stroke']
 
 plt.figure(figsize=(10, 5))
 plt.title("Class Distribution before SMOTE")
@@ -342,7 +349,7 @@ plt.xticks([0, 1])
 plt.xlabel("Stroke(0=No,1=Yes)")
 plt.ylabel("Count")
 plt.show()
-unique, counts = np.unique(y, return_counts=True)
+unique, counts = np.unique(y_train, return_counts=True)
 
 #%%
 
@@ -355,10 +362,10 @@ for i in range(len(unique)):
 
 # Apply SMOTE oversampling
 smote = SMOTE(random_state=42)
-X, y = smote.fit_resample(X, y)
+X_train, y_train = smote.fit_resample(X_train, y_train)
 
 # Count the number of instances in each class after oversampling
-unique, counts = np.unique(y, return_counts=True)
+unique, counts = np.unique(y_train, return_counts=True)
 #%%
 # Print the count of instances in each class after oversampling
 print("Class counts after SMOTE oversampling:")
@@ -385,11 +392,6 @@ df.drop('avg_glucose_level', axis=1, inplace=True)
 
 
 #%%
-# # SPLIT TEST AND TRAIN PART
-X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
-
-
-#%%
 # Perform feature scaling using StandardScaler for MLPClassifer and Keras
 scaler = StandardScaler()
 scaler.fit(X_train)
@@ -402,6 +404,7 @@ X_test_scaled = scaler.transform(X_test)
 
 # RANDOM FOREST
 rfc = RandomForestClassifier(random_state=42)
+scores = cross_val_score(rfc, X_train_scaled, y_train, cv=10)
 rfc.fit(X_train_scaled, y_train)
 y_pred = rfc.predict(X_test_scaled)
 accuracy = accuracy_score(y_test, y_pred)
@@ -410,7 +413,6 @@ print("random-forest Classification report \n",classification_report(y_test, y_p
 print("Accuracy-Random-forest\n:", accuracy)
 y_pred_proba = rfc.predict_proba(X_test_scaled)[:, 1]
 auc = roc_auc_score(y_test, y_pred_proba)
-print("AUC:", auc)
 fpr, tpr, thresholds = roc_curve(y_test, y_pred_proba)
 plt.plot(fpr, tpr, label='Random Forest (AUC = %0.2f)' % auc)
 plt.xlabel('False Positive Rate')
@@ -423,6 +425,8 @@ plt.show()
 # Gradient Boosting Classifier
 
 gbc = GradientBoostingClassifier(random_state=42)
+scores = cross_val_score(gbc, X_train_scaled, y_train, cv=10)
+
 # Fit the model to the training data
 gbc.fit(X_train_scaled, y_train)
 # Use the model to make predictions on the testing data
@@ -433,7 +437,6 @@ print("Gradient Boosting Classifier confusion matrix- \n",confusion_matrix(y_tes
 print("Gradient Boosting Classifier Classification report \n",classification_report(y_test, y_pred))
 y_pred_proba = gbc.predict_proba(X_test_scaled)[:, 1]
 auc = roc_auc_score(y_test, y_pred_proba)
-print("AUC:", auc)
 fpr, tpr, thresholds = roc_curve(y_test, y_pred_proba)
 plt.plot(fpr, tpr, label='Gradient Boosting Classifier (AUC = %0.2f)' % auc)
 plt.xlabel('False Positive Rate')
@@ -444,6 +447,7 @@ plt.show()
 
 # XGBOOST
 xgb = XGBClassifier()
+scores = cross_val_score(xgb, X_train_scaled, y_train, cv=10)
 # Train the classifier on the training data
 xgb.fit(X_train_scaled, y_train)
 # Make predictions on the testing data
@@ -456,7 +460,6 @@ print("Accuracy-XGBOOST\n:", accuracy)
 y_pred_proba = xgb.predict_proba(X_test_scaled)[:, 1]
 # Calculate the AUC score for the XGBoost classifier
 auc = roc_auc_score(y_test, y_pred_proba)
-print("AUC:", auc)
 # Calculate the false positive rate and true positive rate for various thresholds
 fpr, tpr, thresholds = roc_curve(y_test, y_pred_proba)
 # Plot the ROC curve
@@ -467,30 +470,20 @@ plt.title('ROC Curves')
 plt.legend(loc='best')
 plt.show()
 
+from sklearn.metrics import plot_confusion_matrix, plot_roc_curve
 
-# Confusion Matrix for Logistic
 plot_confusion_matrix(rfc, X_test_scaled, y_test, cmap='Blues')
 plt.title('Random Forest Confusion Matrix')
-
-# ROC Curve for Logistic
 plot_roc_curve(rfc, X_test_scaled, y_test)
 plt.title('Random Forest ROC Curve')
-
-# Confusion Matrix for KNN
 plot_confusion_matrix(gbc, X_test_scaled, y_test, cmap='Blues')
 plt.title('Gradient Boosting Classifier Confusion Matrix')
-
-# ROC Curve for KNN
 plot_roc_curve(gbc, X_test_scaled, y_test)
 plt.title('Gradient Boosting Classifier ROC Curve')
 
-from sklearn.metrics import plot_confusion_matrix, plot_roc_curve
 
-# Confusion Matrix for SVM
 plot_confusion_matrix(xgb, X_test_scaled, y_test, cmap='Blues')
 plt.title('XGBOOST Confusion Matrix')
-
-# ROC Curve for SVM
 plot_roc_curve(xgb, X_test_scaled, y_test)
 plt.title('XGBOOST ROC Curve')
 
