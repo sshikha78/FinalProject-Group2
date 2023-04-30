@@ -30,6 +30,9 @@ from sklearn.neighbors import KNeighborsClassifier
 from sklearn.svm import SVC
 from sklearn.metrics import accuracy_score, confusion_matrix, classification_report
 from sklearn.metrics import plot_confusion_matrix
+from sklearn.model_selection import cross_val_score
+from sklearn.metrics import plot_roc_curve
+from sklearn.metrics import plot_confusion_matrix, plot_roc_curve
 
 df = pd.read_csv("healthcare-dataset-stroke-data.csv")
 #%%
@@ -56,7 +59,6 @@ print(df.dtypes)
 for col in df.columns:
   if df[col].dtype != 'float64':
     print(f"{col} has unique values:{df[col].unique()}")
-
 
 # Filling Null Data
 # We will fill the null values of bmi column with the mean of this column
@@ -375,6 +377,14 @@ plt.legend()
 plt.show()
 
 #%%
+#Feature Reduction
+df.drop('gender_0', axis=1, inplace=True)
+df.drop('gender_1', axis=1, inplace=True)
+df.drop('gender_2', axis=1, inplace=True)
+df.drop('avg_glucose_level', axis=1, inplace=True)
+
+
+#%%
 # # SPLIT TEST AND TRAIN PART
 X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
 
@@ -575,24 +585,24 @@ print(f'F1-score: {f1_score(y_test, y_pred_keras_binary):.3f}')
 
 # Logistic Regression
 lr = LogisticRegression()
-lr.fit(X_train, y_train)
-lr_pred = lr.predict(X_test)
+lr.fit(X_train_scaled, y_train)
+lr_pred = lr.predict(X_test_scaled)
 print('Logistic Regression Accuracy:', accuracy_score(y_test, lr_pred))
 print(confusion_matrix(y_test, lr_pred))
 print(classification_report(y_test, lr_pred))
 
 # K-Nearest Neighbors
 knn = KNeighborsClassifier()
-knn.fit(X_train, y_train)
-knn_pred = knn.predict(X_test)
+knn.fit(X_train_scaled, y_train)
+knn_pred = knn.predict(X_test_scaled)
 print('K-Nearest Neighbors Accuracy:', accuracy_score(y_test, knn_pred))
 print(confusion_matrix(y_test, knn_pred))
 print(classification_report(y_test, knn_pred))
 
 # Support Vector Machine
 svm = SVC()
-svm.fit(X_train, y_train)
-svm_pred = svm.predict(X_test)
+svm.fit(X_train_scaled, y_train)
+svm_pred = svm.predict(X_test_scaled)
 print('Support Vector Machine Accuracy:', accuracy_score(y_test, svm_pred))
 print(confusion_matrix(y_test, svm_pred))
 print(classification_report(y_test, svm_pred))
@@ -603,9 +613,9 @@ models = [('Logistic Regression', lr), ('KNN', knn), ('SVM', svm)]
 # Iterate over the models
 for name, model in models:
     # Train the model on the training data
-    model.fit(X_train, y_train)
+    model.fit(X_train_scaled, y_train)
     # Make predictions on the test data
-    y_pred = model.predict(X_test)
+    y_pred = model.predict(X_test_scaled)
     # Compute the confusion matrix
     conf_mat = plot_confusion_matrix(model, X_test, y_test, cmap=plt.cm.Blues, normalize='true')
     # Set the title of the plot
@@ -614,49 +624,19 @@ for name, model in models:
     plt.colorbar(conf_mat.im_, ax=plt.gca())
     # Show the plot
     plt.show()
-from sklearn.metrics import plot_roc_curve
 
 # Create a logistic regression model
 logreg = LogisticRegression()
 # Train the model on the training data
-logreg.fit(X_train, y_train)
+logreg.fit(X_train_scaled, y_train)
 # Plot the ROC curve
-plot_roc_curve(logreg, X_test, y_test)
+plot_roc_curve(logreg, X_test_scaled, y_test)
 # Set the title of the plot
 plt.title("Logistic Regression ROC Curve")
 # Show the plot
 plt.show()
 
 
-from sklearn.metrics import plot_precision_recall_curve
-
-# Create a logistic regression model
-logreg = LogisticRegression()
-# Train the model on the training data
-logreg.fit(X_train, y_train)
-# Plot the precision-recall curve
-plot_precision_recall_curve(logreg, X_test, y_test)
-# Set the title of the plot
-plt.title("Logistic Regression Precision-Recall Curve")
-# Show the plot
-plt.show()
-
-# Create a logistic regression model
-logreg = LogisticRegression()
-# Train the model on the training data
-logreg.fit(X_train, y_train)
-# Get the coefficients of the model
-coefs = logreg.coef_[0]
-# Create a list of feature names
-features = X.columns
-# Create a bar chart of the feature importances
-plt.bar(features, coefs)
-# Set the title of the plot
-plt.title("Logistic Regression Feature Importances")
-# Show the plot
-plt.show()
-
-from sklearn.metrics import plot_confusion_matrix, plot_roc_curve
 
 
 # Confusion Matrix for KNN
@@ -676,5 +656,23 @@ plt.title('SVM Confusion Matrix')
 # ROC Curve for SVM
 plot_roc_curve(svm, X_test_scaled, y_test)
 plt.title('SVM ROC Curve')
+
+# %%
+#Cross Validation
+
+# Logistic Regression
+lr = LogisticRegression()
+lr_scores = cross_val_score(lr, X_train_scaled, y_train, cv=10)
+print('Logistic Regression Accuracy:', lr_scores.mean())
+
+# K-Nearest Neighbors
+knn = KNeighborsClassifier()
+knn_scores = cross_val_score(knn, X_train_scaled, y_train, cv=10)
+print('K-Nearest Neighbors Accuracy:', knn_scores.mean())
+
+# Support Vector Machine
+svm = SVC()
+svm_scores = cross_val_score(svm, X_train_scaled, y_train, cv=10)
+print('Support Vector Machine Accuracy:', svm_scores.mean())
 
 # %%
