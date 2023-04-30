@@ -372,11 +372,9 @@ print("Class counts after SMOTE oversampling:")
 for i in range(len(unique)):
     print("Class", unique[i], ":", counts[i])
 
-
-
 plt.figure(figsize=(10, 5))
 plt.title("Class Distribution after SMOTE")
-plt.hist(y, bins=2, rwidth=0.8)
+plt.hist(y_train, bins=2, rwidth=0.8)
 plt.xticks([0, 1])
 plt.xlabel("Stroke(0=No,1=Yes)")
 plt.ylabel("Count")
