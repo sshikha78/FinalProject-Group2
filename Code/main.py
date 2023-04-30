@@ -173,16 +173,8 @@ plt.show()
 
 
 #EDA by Sanjana
-#
-#Heat map
-#Heat map
-plt.figure(figsize=(12,8))
-sns.heatmap(df.corr(), annot=True, cmap='coolwarm', center=0)
-plt.title('Correlation map for variables')
-plt.show()
 
-correlation = df.corr()
-print(correlation)
+
 
 #Stacked Histogram of Gender and Stroke
 sns.histplot(data=df, x='gender',hue='stroke',
@@ -236,6 +228,16 @@ for col in df.columns:
     print(f"{col} has unique values:{df[col].unique()}")
 
 print(df.head().to_string())
+
+# HeatMap
+plt.figure(figsize=(10,8))
+sns.heatmap(df.corr(), annot=True, cmap='coolwarm', center=0)
+plt.title('Correlation map for variables')
+plt.tight_layout()
+plt.show()
+
+correlation = df.corr()
+print(correlation)
 
 ## Feature Engineering:
 # over = SMOTE(sampling_strategy=1)
