@@ -1,3 +1,4 @@
+#%%
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
@@ -25,7 +26,7 @@ from sklearn.preprocessing import LabelEncoder
 from sklearn.metrics import accuracy_score, confusion_matrix, classification_report
 
 df = pd.read_csv("healthcare-dataset-stroke-data.csv")
-
+#%%
 # Print the first 5 rows of the DataFrame
 print(df.head().to_string())
 
@@ -62,6 +63,7 @@ df.drop('id', axis=1, inplace=True)
 # Convert the stroke column to integers (0 for no stroke, 1 for stroke)
 df['stroke'] = df['stroke'].astype(int)
 
+#%%
 # PRE PROCESSING + EDA
 
 # Target feature - Stroke
@@ -170,12 +172,84 @@ for i in range(0, len(nums)):
     plt.tight_layout()
 plt.show()
 
+# Plotting age histogram
+plt.hist(df['age'], bins=20)
+plt.xlabel('Age')
+plt.ylabel('Frequency')
+plt.title('Age Distribution')
+plt.show()
+
+# Plotting age histogram for strokes
+plt.hist(df[df['stroke'] == 1]['age'],bins=20)
+plt.xlabel('Age')
+plt.ylabel('Frequency')
+plt.title('Age Distribution for Stroke Cases')
+plt.show()
+
+# Plotting heart disease bar chart
+heart_disease_counts = df['heart_disease'].value_counts()
+plt.bar(heart_disease_counts.index, heart_disease_counts.values)
+plt.xticks([0, 1], ['No Heart Disease', 'Heart Disease'])
+plt.ylabel('Count')
+plt.title('Heart Disease Distribution')
+plt.show()
+
+# Plotting heart disease bar chart for strokes
+heart_disease_counts = df[df['stroke'] == 1]['heart_disease'].value_counts()
+plt.bar(heart_disease_counts.index, heart_disease_counts.values)
+plt.xticks([0, 1], ['No Heart Disease', 'Heart Disease'])
+plt.ylabel('Count')
+plt.title('Heart Disease Distribution for Stroke Cases')
+plt.show()
+
+# Plotting age vs heart disease for strokes
+plt.scatter(df[df['stroke'] == 1]['age'], df[df['stroke'] == 1]['heart_disease'],
+            label='Stroke', color='red', alpha=0.5)
+plt.xlabel('Age')
+plt.ylabel('Heart Disease')
+plt.title('Age vs Heart Disease for Stroke Cases')
+plt.legend()
+plt.show()
 
 
-# #EDA by Sanjana
-#
-#
-#
+# Plotting ever married pie chart
+fig = plt.figure(facecolor='white')
+ever_married_counts = df['ever_married'].value_counts()
+plt.pie(ever_married_counts.values, labels=ever_married_counts.index, autopct='%1.1f%%')
+plt.title('Ever Married Distribution')
+plt.show()
+
+# Plotting ever married pie chart for strokes
+fig = plt.figure(facecolor='white')
+ever_married_counts = df[df['stroke'] == 1]['ever_married'].value_counts()
+plt.pie(ever_married_counts.values, labels=ever_married_counts.index, autopct='%1.1f%%')
+plt.title('Ever Married Distribution for Stroke Cases')
+plt.show()
+
+# Plotting age vs ever married for strokes
+plt.scatter(df[df['stroke'] == 1]['age'], df[df['stroke'] == 1]['ever_married'],
+            label='Stroke', color='red', alpha=0.5)
+plt.xlabel('Age')
+plt.ylabel('Ever Married')
+plt.title('Age vs Ever Married for Stroke Cases')
+plt.legend()
+plt.show()
+
+# Plotting ever married vs heart disease for strokes
+ever_married_counts = df[df['stroke'] == 1]['ever_married'].value_counts()
+heart_disease_counts = df[df['stroke'] == 1]['heart_disease'].value_counts()
+plt.bar(['Not Ever Married, No Heart Disease', 'Not Ever Married, Heart Disease',
+         'Ever Married, No Heart Disease', 'Ever Married, Heart Disease'],
+        [df[(df['ever_married'] == 'No') & (df['heart_disease'] == 0) & (df['stroke'] == 1)].shape[0],
+         df[(df['ever_married'] == 'No') & (df['heart_disease'] == 1) & (df['stroke'] == 1)].shape[0],
+         df[(df['ever_married'] == 'Yes') & (df['heart_disease'] == 0) & (df['stroke'] == 1)].shape[0],
+         df[(df['ever_married'] == 'Yes') & (df['heart_disease'] == 1) & (df['stroke'] == 1)].shape[0]],
+        color=['green', 'red', 'purple', 'blue'], alpha=0.5)
+plt.ylabel('Count')
+plt.title('Ever Married vs Heart Disease Distribution for Stroke Cases')
+plt.xticks(rotation=45)
+plt.show()
+
 #Stacked Histogram of Gender and Stroke
 sns.histplot(data=df, x='gender',hue='stroke',
     multiple="stack",
@@ -239,27 +313,10 @@ plt.show()
 correlation = df.corr()
 print(correlation)
 
-# ## Feature Engineering:
-# # over = SMOTE(sampling_strategy=1)
-# # under = RandomUnderSampler(sampling_strategy=0.1)
-#
-# # features = df.loc[:, :'smoking_status']
-# # target = df['stroke']
-# # steps = [('under', under), ('over', over)]
-# # pipeline = Pipeline(steps=steps)
-# # features, target = pipeline.fit_resample(features, target)
-#
-# # print(Counter(target))
-#
-#
-#
-# # SPLIT TEST AND TRAIN PART
-# X_train, X_test, y_train, y_test = train_test_split(features,
-#                                                     target, test_size=0.2, random_state=42)
+
 # Encode categorical variables
 df = pd.get_dummies(df, columns=['gender', 'ever_married', 'work_type', 'Residence_type', 'smoking_status'])
-## Feature Engineering:
-
+# Feature Engineering:
 X = df.drop(['stroke'], axis=1)
 y = df['stroke']
 
@@ -300,9 +357,11 @@ plt.ylabel("Count")
 plt.legend()
 plt.show()
 
-
+#%%
 # # SPLIT TEST AND TRAIN PART
 X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+
+#%%
 # MACHINE LEARNING ALGORITHMS
 
 
@@ -379,17 +438,17 @@ scaler.fit(X_train)
 X_train_scaled = scaler.fit_transform(X_train)
 X_test_scaled = scaler.transform(X_test)
 
-
+#%%
 # Neural Network
 from sklearn.neural_network import MLPClassifier
 # Neural network model
 mlp = MLPClassifier(max_iter=1000, random_state=1)
 parameter_space = {
-    'hidden_layer_sizes': [(30,5)],
-    'activation': ['logistic', 'tanh', 'relu'],
-    'solver': ['sgd', 'adam', 'lbfgs'],
-    'alpha': [0.9],
-    'learning_rate': ['constant','adaptive', 'learning'],
+    'hidden_layer_sizes': [(70,5)],
+    'activation': ['relu'],
+    'solver': ['sgd'],
+    'alpha': [0.001],
+    'learning_rate': ['adaptive'],
 }
 # experimented with these parameters below
 # parameter_space = {
@@ -410,6 +469,12 @@ test_acc = clf.score(X_test_scaled, y_test)
 print(f'Train accuracy: {train_acc:.3f}')
 print(f'Test accuracy: {test_acc:.3f}')
 print('Best parameters found:\n', clf.best_params_)
+
+from sklearn.model_selection import cross_val_score
+# Cross-Val to test generalization
+cross_score = cross_val_score(clf, X, y, cv=5)
+print('Cross-validation scores:', cross_score)
+print('Average cross-validation scores:', np.mean(cross_score))
 
 y_pred = clf.predict(X_test_scaled)
 from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_score
@@ -435,7 +500,7 @@ plt.title('Receiver Operating Characteristic')
 plt.legend(loc="lower right")
 plt.show()
 
-
+#%%
 # Keras Model
 from keras.models import Sequential
 from keras.layers import Dense
@@ -487,17 +552,8 @@ print(f'Precision: {precision_score(y_test, y_pred_keras_binary):.3f}')
 print(f'Recall: {recall_score(y_test, y_pred_keras_binary):.3f}')
 print(f'F1-score: {f1_score(y_test, y_pred_keras_binary):.3f}')
 
-#Models
-# Encode categorical variables
-df = pd.get_dummies(df, columns=['gender', 'ever_married', 'work_type', 'Residence_type', 'smoking_status'])
-
-X = df.drop(['stroke'], axis=1)
-y = df['stroke']
-X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
-
-scaler = StandardScaler()
-X_train = scaler.fit_transform(X_train)
-X_test = scaler.transform(X_test)
+#%%
+# Models
 
 # Logistic Regression
 lr = LogisticRegression()
@@ -584,8 +640,6 @@ plt.show()
 
 from sklearn.metrics import plot_confusion_matrix, plot_roc_curve
 
-# Scale the test data using the same scaler used for training data
-X_test_scaled = scaler.transform(X_test)
 
 # Confusion Matrix for KNN
 plot_confusion_matrix(knn, X_test_scaled, y_test, cmap='Blues')
@@ -597,9 +651,6 @@ plt.title('KNN ROC Curve')
 
 from sklearn.metrics import plot_confusion_matrix, plot_roc_curve
 
-# Scale the test data using the same scaler used for training data
-X_test_scaled = scaler.transform(X_test)
-
 # Confusion Matrix for SVM
 plot_confusion_matrix(svm, X_test_scaled, y_test, cmap='Blues')
 plt.title('SVM Confusion Matrix')
@@ -610,30 +661,14 @@ plt.title('SVM ROC Curve')
 
 
 from sklearn.tree import DecisionTreeClassifier
-from sklearn.ensemble import RandomForestClassifier, GradientBoostingClassifier
+from sklearn.ensemble import GradientBoostingClassifier
 from sklearn.naive_bayes import GaussianNB
-from sklearn.neural_network import MLPClassifier
-
-
-# Split the dataset into training and test sets
-X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
-
-# Scale the data using StandardScaler
-scaler = StandardScaler()
-X_train_scaled = scaler.fit_transform(X_train)
-X_test_scaled = scaler.transform(X_test)
 
 # Decision Tree
 dt = DecisionTreeClassifier(random_state=42)
 dt.fit(X_train_scaled, y_train)
 dt_score = dt.score(X_test_scaled, y_test)
 print('Decision Tree Accuracy:', dt_score)
-
-# Random Forest
-rf = RandomForestClassifier(random_state=42)
-rf.fit(X_train_scaled, y_train)
-rf_score = rf.score(X_test_scaled, y_test)
-print('Random Forest Accuracy:', rf_score)
 
 # Gradient Boosting
 gb = GradientBoostingClassifier(random_state=42)
@@ -647,19 +682,5 @@ nb.fit(X_train_scaled, y_train)
 nb_score = nb.score(X_test_scaled, y_test)
 print('Naive Bayes Accuracy:', nb_score)
 
-# Multi-Layer Perceptron
-mlp = MLPClassifier(random_state=42)
-mlp.fit(X_train_scaled, y_train)
-mlp_score = mlp.score(X_test_scaled, y_test)
-print('MLP Accuracy:', mlp_score)
 
-#Plotting all accuracies
-# predictors_group = ('Random Forest', 'Naive Bayes','Gradient Boosting', 'DecisionTree', 'kNN', 'SVM')
-# x_pos = np.arange(len(predictors_group))
-# accuracies1 = [acc_rf, acc_gnb, acc_dt, acc_knn, acc_svm]
-#
-# plt.bar(x_pos, accuracies1, align='center', alpha=0.5, color='blue')
-# plt.xticks(x_pos, predictors_group, rotation='vertical')
-# plt.ylabel('Accuracy (%)')
-# plt.title('Classifier Accuracies')
-# plt.show()
+# %%
