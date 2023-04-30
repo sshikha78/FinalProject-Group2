@@ -503,11 +503,12 @@ plt.show()
 #%%
 # Keras Model
 from keras.models import Sequential
-from keras.layers import Dense
+from keras.layers import Dense, Dropout
 
 # model architecture - simple model
 model = Sequential()
 model.add(Dense(30, input_dim=X_train_scaled.shape[1], activation='relu'))
+model.add(Dropout(0.2))
 model.add(Dense(1, activation='sigmoid'))
 model.compile(loss='binary_crossentropy', optimizer='adam', metrics=['accuracy'])
 # Train the model
