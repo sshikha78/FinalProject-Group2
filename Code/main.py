@@ -610,34 +610,13 @@ print(classification_report(y_test, svm_pred))
 # Create a list of tuples containing model names and instances
 models = [('Logistic Regression', lr), ('KNN', knn), ('SVM', svm)]
 
-# Iterate over the models
-for name, model in models:
-    # Train the model on the training data
-    model.fit(X_train_scaled, y_train)
-    # Make predictions on the test data
-    y_pred = model.predict(X_test_scaled)
-    # Compute the confusion matrix
-    conf_mat = plot_confusion_matrix(model, X_test, y_test, cmap=plt.cm.Blues, normalize='true')
-    # Set the title of the plot
-    plt.title(f"{name} Confusion Matrix")
-    # Add a color bar to the plot
-    plt.colorbar(conf_mat.im_, ax=plt.gca())
-    # Show the plot
-    plt.show()
+# Confusion Matrix for Logistic
+plot_confusion_matrix(lr, X_test_scaled, y_test, cmap='Blues')
+plt.title('Logistic Regression Confusion Matrix')
 
-# Create a logistic regression model
-logreg = LogisticRegression()
-# Train the model on the training data
-logreg.fit(X_train_scaled, y_train)
-# Plot the ROC curve
-plot_roc_curve(logreg, X_test_scaled, y_test)
-# Set the title of the plot
-plt.title("Logistic Regression ROC Curve")
-# Show the plot
-plt.show()
-
-
-
+# ROC Curve for Logistic
+plot_roc_curve(lr, X_test_scaled, y_test)
+plt.title('Logistic Regression ROC Curve')
 
 # Confusion Matrix for KNN
 plot_confusion_matrix(knn, X_test_scaled, y_test, cmap='Blues')
