@@ -24,8 +24,6 @@ from sklearn.ensemble import GradientBoostingClassifier
 from sklearn.preprocessing import LabelEncoder
 from sklearn.metrics import accuracy_score, confusion_matrix, classification_report
 
-
-# Load the dataset into a pandas DataFrame
 df = pd.read_csv("healthcare-dataset-stroke-data.csv")
 
 # Print the first 5 rows of the DataFrame
@@ -80,9 +78,10 @@ plt.show()
 print("Value of count of smoking status-\n",df['smoking_status'].value_counts())
 
 # Plot a bar chart of stroke cases by smoking status -pie
-df['smoking_status'].value_counts().plot(kind="pie")
-plt.title('Smoking Status')
-plt.ylabel('')
+df['smoking_status'].value_counts().plot(kind="pie", autopct='%1.1f%%')
+plt.title('Distribution of Smoking Status')
+plt.axis('equal')
+plt.tight_layout()
 plt.show()
 
 # Bar chart
@@ -148,21 +147,27 @@ plt.ylabel('Frequency')
 plt.show()
 
 # # Checking Outliers Using Box -Plot - for BMI, AVG Glucose Level
-fig, axs = plt.subplots(1, 2, figsize=(12, 8))
-sns.boxplot(x='bmi', data=df, ax=axs[0])
-axs[0].set_title('BMI Distribution')
-sns.boxplot(x='avg_glucose_level', data=df, ax=axs[1])
-axs[1].set_title('Average Glucose Level Distribution')
-plt.tight_layout()
-plt.show()
+
+nums = list(df.select_dtypes(include=['int64','float64']))
+fig, ax = plt.subplots(2, 3, figsize=(20, 10))
+for i in range(0, len(nums)):
+    plt.subplot(2, 3, i+1)
+    sns.boxplot(y=df[nums[i]],color='green',orient='v')
+    plt.tight_layout()
 
 # Methods for treating outliers in the BMI variable
-df['bmi'] = np.log(df['bmi'])
+outlier = ['avg_glucose_level', 'bmi']
+Q1 = df[outlier].quantile(0.25)
+Q3 = df[outlier].quantile(0.75)
+IQR = Q3 - Q1
+df = df[~((df[outlier]<(Q1-1.5*IQR))|(df[outlier]>(Q3+1.5*IQR))).any(axis=1)]
+df.reset_index(drop=True)
 
-# Re-plot the box plot for BMI to confirm outlier treatment
-sns.boxplot(x=df['bmi'])
-plt.title('BMI Box Plot (after Log)')
-plt.xlabel('BMI')
+plt.figure(figsize=(20, 10))
+for i in range(0, len(nums)):
+    plt.subplot(2, 3, i+1)
+    sns.boxplot(y=df[nums[i]],color='green',orient='v')
+    plt.tight_layout()
 plt.show()
 
 
@@ -170,10 +175,14 @@ plt.show()
 #EDA by Sanjana
 #
 #Heat map
-sns.heatmap(df.corr())
+#Heat map
+plt.figure(figsize=(12,8))
+sns.heatmap(df.corr(), annot=True, cmap='coolwarm', center=0)
+plt.title('Correlation map for variables')
+plt.show()
 
-#Correlation plot
-df.corr()
+correlation = df.corr()
+print(correlation)
 
 #Stacked Histogram of Gender and Stroke
 sns.histplot(data=df, x='gender',hue='stroke',
@@ -181,10 +190,11 @@ sns.histplot(data=df, x='gender',hue='stroke',
     palette="rocket",
     edgecolor=".3",
     linewidth=.5)
+plt.show()
 
 #Stacked Histogram of hypertension and Stroke
 sns.histplot(data=df, x='hypertension',hue='stroke',
-    bins=[-0.5, 0.5, 1.5], 
+    bins=[-0.5, 0.5, 1.5],
     discrete=True,
     multiple="stack",
     palette="rocket",
@@ -199,6 +209,7 @@ sns.histplot(data=df, x='work_type',hue='stroke',
     palette="rocket",
     edgecolor=".3",
     linewidth=.5)
+plt.show()
 
 #Box Plot of hypertension vs age
 sns.boxplot(x='hypertension', y='age', data=df)
@@ -602,3 +613,13 @@ mlp.fit(X_train_scaled, y_train)
 mlp_score = mlp.score(X_test_scaled, y_test)
 print('MLP Accuracy:', mlp_score)
 
+#Plotting all accuracies
+# predictors_group = ('Random Forest', 'Naive Bayes','Gradient Boosting', 'DecisionTree', 'kNN', 'SVM')
+# x_pos = np.arange(len(predictors_group))
+# accuracies1 = [acc_rf, acc_gnb, acc_dt, acc_knn, acc_svm]
+#
+# plt.bar(x_pos, accuracies1, align='center', alpha=0.5, color='blue')
+# plt.xticks(x_pos, predictors_group, rotation='vertical')
+# plt.ylabel('Accuracy (%)')
+# plt.title('Classifier Accuracies')
+# plt.show()
