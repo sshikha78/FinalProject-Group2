@@ -227,23 +227,31 @@ for col in df.columns:
 print(df.head().to_string())
 
 ## Feature Engineering:
-over = SMOTE(sampling_strategy=1)
-under = RandomUnderSampler(sampling_strategy=0.1)
+# over = SMOTE(sampling_strategy=1)
+# under = RandomUnderSampler(sampling_strategy=0.1)
 
-features = df.loc[:, :'smoking_status']
-target = df['stroke']
-steps = [('under', under), ('over', over)]
-pipeline = Pipeline(steps=steps)
-features, target = pipeline.fit_resample(features, target)
+# features = df.loc[:, :'smoking_status']
+# target = df['stroke']
+# steps = [('under', under), ('over', over)]
+# pipeline = Pipeline(steps=steps)
+# features, target = pipeline.fit_resample(features, target)
 
-print(Counter(target))
+# print(Counter(target))
 
 
 
-# SPLIT TEST AND TRAIN PART
-X_train, X_test, y_train, y_test = train_test_split(features,
-                                                    target, test_size=0.2, random_state=42)
-
+# # SPLIT TEST AND TRAIN PART
+# X_train, X_test, y_train, y_test = train_test_split(features,
+#                                                     target, test_size=0.2, random_state=42)
+# Encode categorical variables
+df = pd.get_dummies(df, columns=['gender', 'ever_married', 'work_type', 'Residence_type', 'smoking_status'])
+## Feature Engineering:
+X = df.drop(['stroke'], axis=1)
+y = df['stroke']
+smote = SMOTE(random_state=42)
+X, y = smote.fit_resample(X, y)
+# # SPLIT TEST AND TRAIN PART
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
 # MACHINE LEARNING ALGORITHMS
 
 
@@ -427,4 +435,170 @@ print(f'Accuracy: {accuracy_score(y_test, y_pred_keras_binary):.3f}')
 print(f'Precision: {precision_score(y_test, y_pred_keras_binary):.3f}')
 print(f'Recall: {recall_score(y_test, y_pred_keras_binary):.3f}')
 print(f'F1-score: {f1_score(y_test, y_pred_keras_binary):.3f}')
+
+#Models
+# Encode categorical variables
+df = pd.get_dummies(df, columns=['gender', 'ever_married', 'work_type', 'Residence_type', 'smoking_status'])
+
+X = df.drop(['stroke'], axis=1)
+y = df['stroke']
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+
+scaler = StandardScaler()
+X_train = scaler.fit_transform(X_train)
+X_test = scaler.transform(X_test)
+
+# Logistic Regression
+lr = LogisticRegression()
+lr.fit(X_train, y_train)
+lr_pred = lr.predict(X_test)
+print('Logistic Regression Accuracy:', accuracy_score(y_test, lr_pred))
+print(confusion_matrix(y_test, lr_pred))
+print(classification_report(y_test, lr_pred))
+
+# K-Nearest Neighbors
+knn = KNeighborsClassifier()
+knn.fit(X_train, y_train)
+knn_pred = knn.predict(X_test)
+print('K-Nearest Neighbors Accuracy:', accuracy_score(y_test, knn_pred))
+print(confusion_matrix(y_test, knn_pred))
+print(classification_report(y_test, knn_pred))
+
+# Support Vector Machine
+svm = SVC()
+svm.fit(X_train, y_train)
+svm_pred = svm.predict(X_test)
+print('Support Vector Machine Accuracy:', accuracy_score(y_test, svm_pred))
+print(confusion_matrix(y_test, svm_pred))
+print(classification_report(y_test, svm_pred))
+
+# Create a list of tuples containing model names and instances
+models = [('Logistic Regression', lr), ('KNN', knn), ('SVM', svm)]
+
+# Iterate over the models
+for name, model in models:
+    # Train the model on the training data
+    model.fit(X_train, y_train)
+    # Make predictions on the test data
+    y_pred = model.predict(X_test)
+    # Compute the confusion matrix
+    conf_mat = plot_confusion_matrix(model, X_test, y_test, cmap=plt.cm.Blues, normalize='true')
+    # Set the title of the plot
+    plt.title(f"{name} Confusion Matrix")
+    # Add a color bar to the plot
+    plt.colorbar(conf_mat.im_, ax=plt.gca())
+    # Show the plot
+    plt.show()
+from sklearn.metrics import plot_roc_curve
+
+# Create a logistic regression model
+logreg = LogisticRegression()
+# Train the model on the training data
+logreg.fit(X_train, y_train)
+# Plot the ROC curve
+plot_roc_curve(logreg, X_test, y_test)
+# Set the title of the plot
+plt.title("Logistic Regression ROC Curve")
+# Show the plot
+plt.show()
+
+
+from sklearn.metrics import plot_precision_recall_curve
+
+# Create a logistic regression model
+logreg = LogisticRegression()
+# Train the model on the training data
+logreg.fit(X_train, y_train)
+# Plot the precision-recall curve
+plot_precision_recall_curve(logreg, X_test, y_test)
+# Set the title of the plot
+plt.title("Logistic Regression Precision-Recall Curve")
+# Show the plot
+plt.show()
+
+# Create a logistic regression model
+logreg = LogisticRegression()
+# Train the model on the training data
+logreg.fit(X_train, y_train)
+# Get the coefficients of the model
+coefs = logreg.coef_[0]
+# Create a list of feature names
+features = X.columns
+# Create a bar chart of the feature importances
+plt.bar(features, coefs)
+# Set the title of the plot
+plt.title("Logistic Regression Feature Importances")
+# Show the plot
+plt.show()
+
+from sklearn.metrics import plot_confusion_matrix, plot_roc_curve
+
+# Scale the test data using the same scaler used for training data
+X_test_scaled = scaler.transform(X_test)
+
+# Confusion Matrix for KNN
+plot_confusion_matrix(knn, X_test_scaled, y_test, cmap='Blues')
+plt.title('KNN Confusion Matrix')
+
+# ROC Curve for KNN
+plot_roc_curve(knn, X_test_scaled, y_test)
+plt.title('KNN ROC Curve')
+
+from sklearn.metrics import plot_confusion_matrix, plot_roc_curve
+
+# Scale the test data using the same scaler used for training data
+X_test_scaled = scaler.transform(X_test)
+
+# Confusion Matrix for SVM
+plot_confusion_matrix(svm, X_test_scaled, y_test, cmap='Blues')
+plt.title('SVM Confusion Matrix')
+
+# ROC Curve for SVM
+plot_roc_curve(svm, X_test_scaled, y_test)
+plt.title('SVM ROC Curve')
+
+
+from sklearn.tree import DecisionTreeClassifier
+from sklearn.ensemble import RandomForestClassifier, GradientBoostingClassifier
+from sklearn.naive_bayes import GaussianNB
+from sklearn.neural_network import MLPClassifier
+
+
+# Split the dataset into training and test sets
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+
+# Scale the data using StandardScaler
+scaler = StandardScaler()
+X_train_scaled = scaler.fit_transform(X_train)
+X_test_scaled = scaler.transform(X_test)
+
+# Decision Tree
+dt = DecisionTreeClassifier(random_state=42)
+dt.fit(X_train_scaled, y_train)
+dt_score = dt.score(X_test_scaled, y_test)
+print('Decision Tree Accuracy:', dt_score)
+
+# Random Forest
+rf = RandomForestClassifier(random_state=42)
+rf.fit(X_train_scaled, y_train)
+rf_score = rf.score(X_test_scaled, y_test)
+print('Random Forest Accuracy:', rf_score)
+
+# Gradient Boosting
+gb = GradientBoostingClassifier(random_state=42)
+gb.fit(X_train_scaled, y_train)
+gb_score = gb.score(X_test_scaled, y_test)
+print('Gradient Boosting Accuracy:', gb_score)
+
+# Naive Bayes
+nb = GaussianNB()
+nb.fit(X_train_scaled, y_train)
+nb_score = nb.score(X_test_scaled, y_test)
+print('Naive Bayes Accuracy:', nb_score)
+
+# Multi-Layer Perceptron
+mlp = MLPClassifier(random_state=42)
+mlp.fit(X_train_scaled, y_train)
+mlp_score = mlp.score(X_test_scaled, y_test)
+print('MLP Accuracy:', mlp_score)
 
