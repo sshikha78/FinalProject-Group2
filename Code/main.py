@@ -406,14 +406,14 @@ rfc = RandomForestClassifier(random_state=42)
 scores = cross_val_score(rfc, X_train_scaled, y_train, cv=10)
 rfc.fit(X_train_scaled, y_train)
 y_pred = rfc.predict(X_test_scaled)
-accuracy = accuracy_score(y_test, y_pred)
+accuracy_random = accuracy_score(y_test, y_pred)
 print("random-forest confusion matrix \n",confusion_matrix(y_test, y_pred))
 print("random-forest Classification report \n",classification_report(y_test, y_pred))
-print("Accuracy-Random-forest\n:", accuracy)
+print("Accuracy-Random-forest\n:", accuracy_random)
 y_pred_proba = rfc.predict_proba(X_test_scaled)[:, 1]
-auc = roc_auc_score(y_test, y_pred_proba)
+auc_random = roc_auc_score(y_test, y_pred_proba)
 fpr, tpr, thresholds = roc_curve(y_test, y_pred_proba)
-plt.plot(fpr, tpr, label='Random Forest (AUC = %0.2f)' % auc)
+plt.plot(fpr, tpr, label='Random Forest (AUC = %0.2f)' % auc_random)
 plt.xlabel('False Positive Rate')
 plt.ylabel('True Positive Rate')
 plt.title('ROC Curves')
@@ -430,14 +430,14 @@ scores = cross_val_score(gbc, X_train_scaled, y_train, cv=10)
 gbc.fit(X_train_scaled, y_train)
 # Use the model to make predictions on the testing data
 y_pred = gbc.predict(X_test_scaled)
-accuracy = accuracy_score(y_test, y_pred)
-print("Accuracy-Gradient Boosting Classifier\n:", accuracy)
+accuracy_gbc = accuracy_score(y_test, y_pred)
+print("Accuracy-Gradient Boosting Classifier\n:", accuracy_gbc)
 print("Gradient Boosting Classifier confusion matrix- \n",confusion_matrix(y_test, y_pred))
 print("Gradient Boosting Classifier Classification report \n",classification_report(y_test, y_pred))
 y_pred_proba = gbc.predict_proba(X_test_scaled)[:, 1]
-auc = roc_auc_score(y_test, y_pred_proba)
+auc_gbc = roc_auc_score(y_test, y_pred_proba)
 fpr, tpr, thresholds = roc_curve(y_test, y_pred_proba)
-plt.plot(fpr, tpr, label='Gradient Boosting Classifier (AUC = %0.2f)' % auc)
+plt.plot(fpr, tpr, label='Gradient Boosting Classifier (AUC = %0.2f)' % auc_gbc)
 plt.xlabel('False Positive Rate')
 plt.ylabel('True Positive Rate')
 plt.title('ROC Curves')
@@ -452,17 +452,17 @@ xgb.fit(X_train_scaled, y_train)
 # Make predictions on the testing data
 y_pred = xgb.predict(X_test_scaled)
 # Evaluate the accuracy of the model
-accuracy = accuracy_score(y_test, y_pred)
+accuracy_xbg = accuracy_score(y_test, y_pred)
 print("XGBOOST confusion matrix- \n",confusion_matrix(y_test, y_pred))
 print("XGBOOST Classification report  \n",classification_report(y_test, y_pred))
-print("Accuracy-XGBOOST\n:", accuracy)
+print("Accuracy-XGBOOST\n:", accuracy_xbg)
 y_pred_proba = xgb.predict_proba(X_test_scaled)[:, 1]
 # Calculate the AUC score for the XGBoost classifier
-auc = roc_auc_score(y_test, y_pred_proba)
+auc_xbg = roc_auc_score(y_test, y_pred_proba)
 # Calculate the false positive rate and true positive rate for various thresholds
 fpr, tpr, thresholds = roc_curve(y_test, y_pred_proba)
 # Plot the ROC curve
-plt.plot(fpr, tpr, label='XGBoost (AUC = %0.2f)' % auc)
+plt.plot(fpr, tpr, label='XGBoost (AUC = %0.2f)' % auc_xbg)
 plt.xlabel('False Positive Rate')
 plt.ylabel('True Positive Rate')
 plt.title('ROC Curves')
@@ -712,3 +712,32 @@ svm_scores = cross_val_score(svm, X_train_scaled, y_train, cv=10)
 print('Support Vector Machine Accuracy:', svm_scores.mean())
 
 # %%
+from tabulate import tabulate
+from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_score, roc_auc_score, roc_curve
+from sklearn.model_selection import cross_val_score
+models = [
+    ('Logistic Regression', lr),
+    ('KNN', knn),
+    ('SVM', svm),
+    ('Random Forest', rfc),
+    ('Gradient Boosting Classifier', gbc),
+    ('XGBoost', xgb),
+    ('Neural Network', clf),
+    ('Keras', model)
+]
+table = []
+for name, model in models:
+    model.fit(X_train_scaled, y_train)
+    y_pred = model.predict(X_test_scaled)
+    acc = accuracy_score(y_test, y_pred)
+    pre = precision_score(y_test, y_pred)
+    rec = recall_score(y_test, y_pred)
+    f1 = f1_score(y_test, y_pred)
+    y_pred_proba = model.predict_proba(X_test_scaled)[:, 1]
+    auc = roc_auc_score(y_test, y_pred_proba)
+    fpr, tpr, _ = roc_curve(y_test, y_pred_proba)
+    cv_score = cross_val_score(model, X_train_scaled, y_train, cv=10).mean()
+    row = [name, acc, pre, rec, f1, auc, cv_score]
+    table.append(row)
+headers = ['Model', 'Accuracy', 'Precision', 'Recall', 'F1-score', 'ROC AUC', 'Cross-validation']
+print(tabulate(table, headers=headers, floatfmt=".3f"))
