@@ -558,6 +558,7 @@ plt.show()
 
 #%%
 # Keras Model
+from keras.wrappers.scikit_learn import KerasClassifier
 from keras.models import Sequential
 from keras.layers import Dense, Dropout
 
@@ -566,9 +567,9 @@ model = Sequential()
 model.add(Dense(30, input_dim=X_train_scaled.shape[1], activation='relu'))
 model.add(Dropout(0.2))
 model.add(Dense(1, activation='sigmoid'))
-model.compile(loss='binary_crossentropy', optimizer='adam', metrics=['accuracy'])
+model.compile(loss='mse', optimizer='adam', metrics=['accuracy'])
 # Train the model
-history = model.fit(X_train_scaled, y_train, validation_data=(X_test_scaled, y_test), epochs=300)
+history = model.fit(X_train_scaled, y_train, validation_data=(X_test_scaled, y_test), epochs=50,verbose=0)
 # Evaluate the model
 loss, accuracy = model.evaluate(X_test_scaled, y_test)
 print(f'Test loss: {loss:.3f}')
@@ -608,6 +609,23 @@ print(f'Accuracy: {accuracy_score(y_test, y_pred_keras_binary):.3f}')
 print(f'Precision: {precision_score(y_test, y_pred_keras_binary):.3f}')
 print(f'Recall: {recall_score(y_test, y_pred_keras_binary):.3f}')
 print(f'F1-score: {f1_score(y_test, y_pred_keras_binary):.3f}')
+
+#%%
+# Wrapper class to utilize the Cross Validation
+def create_model():
+    model = Sequential()
+    model.add(Dense(30, input_dim=X_train_scaled.shape[1], activation='relu'))
+    model.add(Dropout(0.2))
+    model.add(Dense(1, activation='sigmoid'))
+    model.compile(loss='mse', optimizer='adam', metrics=['accuracy'])
+    return model
+
+# Wrap the Keras model in a scikit-learn classifier
+model = KerasClassifier(build_fn=create_model, epochs=50, verbose=0)
+# Evaluate the model using cross-validation
+scores = cross_val_score(model, X_train_scaled, y_train, cv=3)
+print(f'Cross-validation scores: {scores}')
+print(f'Mean accuracy: {scores.mean()}')
 
 #%%
 # Models
