@@ -24,6 +24,12 @@ from sklearn.preprocessing import StandardScaler
 from sklearn.ensemble import GradientBoostingClassifier
 from sklearn.preprocessing import LabelEncoder
 from sklearn.metrics import accuracy_score, confusion_matrix, classification_report
+from sklearn.preprocessing import StandardScaler
+from sklearn.linear_model import LogisticRegression
+from sklearn.neighbors import KNeighborsClassifier
+from sklearn.svm import SVC
+from sklearn.metrics import accuracy_score, confusion_matrix, classification_report
+from sklearn.metrics import plot_confusion_matrix
 
 df = pd.read_csv("healthcare-dataset-stroke-data.csv")
 #%%
@@ -148,6 +154,8 @@ plt.xlabel('BMI')
 plt.ylabel('Frequency')
 plt.show()
 
+#%%
+
 # # Checking Outliers Using Box -Plot - for BMI, AVG Glucose Level
 
 nums = list(df.select_dtypes(include=['int64','float64']))
@@ -250,6 +258,8 @@ plt.title('Ever Married vs Heart Disease Distribution for Stroke Cases')
 plt.xticks(rotation=45)
 plt.show()
 
+#%%
+
 #Stacked Histogram of Gender and Stroke
 sns.histplot(data=df, x='gender',hue='stroke',
     multiple="stack",
@@ -291,6 +301,8 @@ sns.pairplot(df[['age', 'avg_glucose_level', 'bmi', 'stroke']])
 plt.show()
 
 
+#%%
+
 # Label Encoding
 categorical_col=['gender','ever_married','work_type','Residence_type','smoking_status']
 le = LabelEncoder()
@@ -313,6 +325,7 @@ plt.show()
 correlation = df.corr()
 print(correlation)
 
+#%%
 
 # Encode categorical variables
 df = pd.get_dummies(df, columns=['gender', 'ever_married', 'work_type', 'Residence_type', 'smoking_status'])
@@ -329,10 +342,14 @@ plt.ylabel("Count")
 plt.show()
 unique, counts = np.unique(y, return_counts=True)
 
+#%%
+
 # Print the count of instances in each class before oversampling
 print("Class counts before SMOTE oversampling:")
 for i in range(len(unique)):
     print("Class", unique[i], ":", counts[i])
+
+#%%
 
 # Apply SMOTE oversampling
 smote = SMOTE(random_state=42)
@@ -340,7 +357,7 @@ X, y = smote.fit_resample(X, y)
 
 # Count the number of instances in each class after oversampling
 unique, counts = np.unique(y, return_counts=True)
-
+#%%
 # Print the count of instances in each class after oversampling
 print("Class counts after SMOTE oversampling:")
 for i in range(len(unique)):
