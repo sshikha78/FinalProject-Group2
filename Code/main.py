@@ -401,7 +401,6 @@ X_test_scaled = scaler.transform(X_test)
 #%%
 # MACHINE LEARNING ALGORITHMS
 
-
 # RANDOM FOREST
 rfc = RandomForestClassifier(random_state=42)
 scores = cross_val_score(rfc, X_train_scaled, y_train, cv=10)
