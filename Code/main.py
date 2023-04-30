@@ -388,19 +388,27 @@ df.drop('avg_glucose_level', axis=1, inplace=True)
 # # SPLIT TEST AND TRAIN PART
 X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
 
+
+#%%
+# Perform feature scaling using StandardScaler for MLPClassifer and Keras
+scaler = StandardScaler()
+scaler.fit(X_train)
+X_train_scaled = scaler.fit_transform(X_train)
+X_test_scaled = scaler.transform(X_test)
+
 #%%
 # MACHINE LEARNING ALGORITHMS
 
 
 # RANDOM FOREST
 rfc = RandomForestClassifier(random_state=42)
-rfc.fit(X_train, y_train)
-y_pred = rfc.predict(X_test)
+rfc.fit(X_train_scaled, y_train)
+y_pred = rfc.predict(X_test_scaled)
 accuracy = accuracy_score(y_test, y_pred)
 print("random-forest confusion matrix \n",confusion_matrix(y_test, y_pred))
 print("random-forest Classification report \n",classification_report(y_test, y_pred))
 print("Accuracy-Random-forest\n:", accuracy)
-y_pred_proba = rfc.predict_proba(X_test)[:, 1]
+y_pred_proba = rfc.predict_proba(X_test_scaled)[:, 1]
 auc = roc_auc_score(y_test, y_pred_proba)
 print("AUC:", auc)
 fpr, tpr, thresholds = roc_curve(y_test, y_pred_proba)
@@ -416,14 +424,14 @@ plt.show()
 
 gbc = GradientBoostingClassifier(random_state=42)
 # Fit the model to the training data
-gbc.fit(X_train, y_train)
+gbc.fit(X_train_scaled, y_train)
 # Use the model to make predictions on the testing data
-y_pred = gbc.predict(X_test)
+y_pred = gbc.predict(X_test_scaled)
 accuracy = accuracy_score(y_test, y_pred)
 print("Accuracy-Gradient Boosting Classifier\n:", accuracy)
 print("Gradient Boosting Classifier confusion matrix- \n",confusion_matrix(y_test, y_pred))
 print("Gradient Boosting Classifier Classification report \n",classification_report(y_test, y_pred))
-y_pred_proba = gbc.predict_proba(X_test)[:, 1]
+y_pred_proba = gbc.predict_proba(X_test_scaled)[:, 1]
 auc = roc_auc_score(y_test, y_pred_proba)
 print("AUC:", auc)
 fpr, tpr, thresholds = roc_curve(y_test, y_pred_proba)
@@ -437,15 +445,15 @@ plt.show()
 # XGBOOST
 xgb = XGBClassifier()
 # Train the classifier on the training data
-xgb.fit(X_train, y_train)
+xgb.fit(X_train_scaled, y_train)
 # Make predictions on the testing data
-y_pred = xgb.predict(X_test)
+y_pred = xgb.predict(X_test_scaled)
 # Evaluate the accuracy of the model
 accuracy = accuracy_score(y_test, y_pred)
 print("XGBOOST confusion matrix- \n",confusion_matrix(y_test, y_pred))
 print("XGBOOST Classification report  \n",classification_report(y_test, y_pred))
 print("Accuracy-XGBOOST\n:", accuracy)
-y_pred_proba = xgb.predict_proba(X_test)[:, 1]
+y_pred_proba = xgb.predict_proba(X_test_scaled)[:, 1]
 # Calculate the AUC score for the XGBoost classifier
 auc = roc_auc_score(y_test, y_pred_proba)
 print("AUC:", auc)
@@ -459,11 +467,32 @@ plt.title('ROC Curves')
 plt.legend(loc='best')
 plt.show()
 
-# Perform feature scaling using StandardScaler for MLPClassifer and Keras
-scaler = StandardScaler()
-scaler.fit(X_train)
-X_train_scaled = scaler.fit_transform(X_train)
-X_test_scaled = scaler.transform(X_test)
+
+# Confusion Matrix for Logistic
+plot_confusion_matrix(rfc, X_test_scaled, y_test, cmap='Blues')
+plt.title('Random Forest Confusion Matrix')
+
+# ROC Curve for Logistic
+plot_roc_curve(rfc, X_test_scaled, y_test)
+plt.title('Random Forest ROC Curve')
+
+# Confusion Matrix for KNN
+plot_confusion_matrix(gbc, X_test_scaled, y_test, cmap='Blues')
+plt.title('Gradient Boosting Classifier Confusion Matrix')
+
+# ROC Curve for KNN
+plot_roc_curve(gbc, X_test_scaled, y_test)
+plt.title('Gradient Boosting Classifier ROC Curve')
+
+from sklearn.metrics import plot_confusion_matrix, plot_roc_curve
+
+# Confusion Matrix for SVM
+plot_confusion_matrix(xgb, X_test_scaled, y_test, cmap='Blues')
+plt.title('XGBOOST Confusion Matrix')
+
+# ROC Curve for SVM
+plot_roc_curve(xgb, X_test_scaled, y_test)
+plt.title('XGBOOST ROC Curve')
 
 #%%
 # Neural Network
