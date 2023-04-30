@@ -385,7 +385,9 @@ plt.show()
 
 #%%
 #Feature Reduction
-df.drop('gender', axis=1, inplace=True)
+df.drop('gender_Female', axis=1, inplace=True)
+df.drop('gender_Male', axis=1, inplace=True)
+df.drop('gender_Other', axis=1, inplace=True)
 df.drop('avg_glucose_level', axis=1, inplace=True)
 
 
