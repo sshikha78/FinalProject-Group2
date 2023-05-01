@@ -257,10 +257,24 @@ plt.show()
 #Pair plot for age, avg glucose level, bmi and stroke
 sns.pairplot(df[['age', 'avg_glucose_level', 'bmi', 'stroke']])
 plt.show()
-
+#%%
+# Label Encoding
+categorical_col=['gender','ever_married','work_type','Residence_type','smoking_status']
+le = LabelEncoder()
+for col in categorical_col:
+  df[col] = le.fit_transform(df[col])
+#%%
+# HeatMap
+plt.figure(figsize=(10,8))
+sns.heatmap(df.corr(), annot=True, cmap='coolwarm', center=0)
+plt.title('Correlation map for variables')
+plt.tight_layout()
+plt.show()
+correlation = df.corr()
+print(correlation)
 #%%
 # Encode categorical variables
-df = pd.get_dummies(df, columns=['hypertension', 'heart_disease'])
+df = pd.get_dummies(df, columns=['gender','hypertension', 'heart_disease', 'ever_married', 'work_type', 'Residence_type','smoking_status'])
 
 #%%
 # Feature Engineering:
@@ -306,7 +320,7 @@ for i in range(len(unique)):
     print("Class", unique[i], ":", counts[i])
 plt.figure(figsize=(10, 5))
 plt.title("Class Distribution after SMOTE")
-plt.hist(y, bins=2, rwidth=0.8)
+plt.hist(y_train, bins=2, rwidth=0.8)
 plt.xticks([0, 1])
 plt.xlabel("Stroke(0=No,1=Yes)")
 plt.ylabel("Count")
@@ -417,19 +431,22 @@ print('XGBoost Accuracy:', xgb_scores.mean())
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.feature_selection import RFECV
 np.random.seed(123)
+# Initialize a Random Forest Classifier and a Recursive Feature Elimination with Cross Validation selector
 estimator = RandomForestClassifier()
 selector = RFECV(estimator=estimator, step=1, cv=5, scoring='recall')
+# Fit the selector to the scaled training data
 selector.fit(X_train_scaled, y_train)
-
+# Select the important features from the training and test data using the selector
 X_train_selected = selector.transform(X_train_scaled)
 X_test_selected = selector.transform(X_test_scaled)
 
-# train a new model using the selected features
+# Train a new model using the selected features with a Multi-layer Perceptron Classifier
 from sklearn.neural_network import MLPClassifier
 mlp = MLPClassifier(hidden_layer_sizes=(2,3,2), activation='relu', solver='adam', alpha=0.00001, learning_rate='adaptive')
 mlp.fit(X_train_selected, y_train)
+# Make predictions on the test data using the trained model
 y_pred = mlp.predict(X_test_selected)
-#%%
+# Evaluate Model with Metrics Below
 from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_score
 # Model evaluation
 print(f'Accuracy: {accuracy_score(y_test, y_pred):.3f}')
@@ -460,6 +477,7 @@ plt.show()
 from sklearn.neural_network import MLPClassifier
 mlp = MLPClassifier(max_iter=100)
 np.random.seed(2)
+# Create parameter space for Grid Serch to run and find Best Params
 parameter_space = {
     'hidden_layer_sizes': [(80,)],
     'activation': ['relu'],
@@ -477,12 +495,14 @@ parameter_space = {
 # }
 # GridSearch to find best parameters
 from sklearn.model_selection import GridSearchCV
+# Tune Params and fit
 clf = GridSearchCV(mlp, parameter_space, n_jobs=-1, cv=5, scoring='recall')
 clf.fit(X_train_scaled, y_train)
 
-
+# Score Train and Test Data
 train_acc = clf.score(X_train_scaled, y_train)
 test_acc = clf.score(X_test_scaled, y_test)
+
 print(f'Train accuracy: {train_acc:.3f}')
 print(f'Test accuracy: {test_acc:.3f}')
 print('Best parameters found:\n', clf.best_params_)
