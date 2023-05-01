@@ -416,7 +416,7 @@ print('XGBoost Accuracy:', xgb_scores.mean())
 #%%
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.feature_selection import RFECV
-
+np.random.seed(123)
 estimator = RandomForestClassifier()
 selector = RFECV(estimator=estimator, step=1, cv=5, scoring='recall')
 selector.fit(X_train_scaled, y_train)
@@ -437,17 +437,35 @@ print(f'Precision: {precision_score(y_test, y_pred):.3f}')
 print(f'Recall: {recall_score(y_test, y_pred):.3f}')
 print(f'F1-score: {f1_score(y_test, y_pred):.3f}')
 
+#  ROC AUC Metric
+from sklearn.metrics import roc_curve, auc
+import matplotlib.pyplot as plt
+fpr, tpr, thresholds = roc_curve(y_test, y_pred)
+# Calculate the AUC score
+roc_auc = auc(fpr, tpr)
+# Plot the ROC curve
+plt.plot(fpr, tpr, color='darkorange', lw=2, label='ROC curve (area = %0.2f)' % roc_auc)
+plt.plot([0, 1], [0, 1], color='navy', lw=2, linestyle='--')
+plt.xlim([0.0, 1.0])
+plt.ylim([0.0, 1.05])
+plt.xlabel('False Positive Rate')
+plt.ylabel('True Positive Rate')
+plt.title('Receiver Operating Characteristic')
+plt.legend(loc="lower right")
+plt.show()
+
 
 #%%
 # Neural network model
 from sklearn.neural_network import MLPClassifier
 mlp = MLPClassifier(max_iter=100)
+np.random.seed(2)
 parameter_space = {
     'hidden_layer_sizes': [(80,)],
     'activation': ['relu'],
     'solver': ['adam'],
-    'alpha': [.5, .9],
-    'learning_rate': ['adaptive'],
+    'alpha': [.5],
+    'learning_rate': ['adaptive','constant', 'learning'],
 }
 # experimented with these parameters below
 # parameter_space = {
@@ -469,10 +487,7 @@ print(f'Train accuracy: {train_acc:.3f}')
 print(f'Test accuracy: {test_acc:.3f}')
 print('Best parameters found:\n', clf.best_params_)
 from sklearn.model_selection import cross_val_score
-# # Cross-Val to test generalization
-# cross_score = cross_val_score(clf, X, y, cv=5)
-# print('Cross-validation scores:', cross_score)
-# print('Average cross-validation scores:', np.mean(cross_score))
+
 y_pred = clf.predict(X_test_scaled)
 from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_score
 # Model evaluation
