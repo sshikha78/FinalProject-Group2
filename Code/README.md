@@ -15,7 +15,7 @@ Handling nulls and outliers that were found in the code.
 Scaling quantitative dataset variables and using both get dummies and label encoding to categorical variables.
 ### Feature deduction 
 Reducing the variables that are not correlated to stroke to improve testing later on. 
-### Training
+### Train Split for Models
 Developing out train and test data by splitting the dataset into X and Y sets.
 ### SMOTE
 We have sever imbalancing issues and utilized SMOTE to over sample the minority class so stroke target will be even.
