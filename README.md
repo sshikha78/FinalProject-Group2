@@ -7,8 +7,26 @@ A Stroke Prediction Machine Learning (ML) project aims to predict the likelihood
 
 1. Shikha Sharma
 2. Aaron Rock
-3. Sanjana
+3. Sanjana Godolkar
 
 ## Data Source
 
 The "Stroke Prediction Dataset" on Kaggle is a available dataset that can be used to train a Stroke Prediction Machine Learning model. The dataset contains various features such as age, gender, hypertension, heart disease, and others that can be used as input features to predict the likelihood of a person having a stroke. The dataset contains 5110 observations with 12 attributes, and is available at the following link: https://www.kaggle.com/datasets/fedesoriano/stroke-prediction-dataset
+
+
+## Table of Contents
+Group-Proposal: This file contains the topic proposal
+Code: This file contains the dataset, code(main.py) and a readme 
+Final-Group-Presentation: This file contains the power point presentation
+Final-Group-Project-Report: This file contains the report for the project
+
+## Installation
+
+The following installations might be necessary to run the code:
+pandas
+numpy
+matplotlib
+seaborn
+scikit-learn
+imbalanced-learn
+xgboost
