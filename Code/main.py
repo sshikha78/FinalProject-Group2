@@ -12,7 +12,6 @@ from sklearn.neighbors import KNeighborsClassifier
 from xgboost import XGBClassifier
 from collections import Counter
 from imblearn.over_sampling import SMOTE
-from imblearn.under_sampling import RandomUnderSampler
 from imblearn.pipeline import Pipeline
 from sklearn.model_selection import train_test_split
 from sklearn.linear_model import LogisticRegression
