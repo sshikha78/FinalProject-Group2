@@ -6,40 +6,16 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import LabelEncoder, StandardScaler
-import numpy as np
-import pandas as pd
 import matplotlib.pyplot as plt
 import seaborn as sns
-from sklearn.model_selection import cross_val_score
-from sklearn.metrics import roc_auc_score, roc_curve
-import os
+from sklearn.metrics import roc_curve, auc
 from imblearn.over_sampling import SMOTE
-import imblearn
-from sklearn.neighbors import KNeighborsClassifier
-from xgboost import XGBClassifier
-from collections import Counter
 from imblearn.over_sampling import SMOTE
 from imblearn.pipeline import Pipeline
-from sklearn.model_selection import train_test_split
-from sklearn.linear_model import LogisticRegression
-from sklearn.metrics import accuracy_score, confusion_matrix
+from sklearn.metrics import accuracy_score
 from sklearn.ensemble import RandomForestClassifier
-from sklearn.metrics import classification_report, confusion_matrix
-from sklearn.svm import SVC
-from sklearn.model_selection import train_test_split
-from sklearn.preprocessing import StandardScaler
-from sklearn.ensemble import GradientBoostingClassifier
-from sklearn.preprocessing import LabelEncoder
-from sklearn.metrics import accuracy_score, confusion_matrix, classification_report
-from sklearn.preprocessing import StandardScaler
-from sklearn.linear_model import LogisticRegression
-from sklearn.neighbors import KNeighborsClassifier
-from sklearn.svm import SVC
-from sklearn.metrics import accuracy_score, confusion_matrix, classification_report
-from sklearn.metrics import plot_confusion_matrix
-from sklearn.model_selection import cross_val_score
-from sklearn.metrics import plot_roc_curve
-from sklearn.metrics import plot_confusion_matrix, plot_roc_curve
+from sklearn.metrics import classification_report
+from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_score
 
 # %%
 # Load Stroke Preciction Dataset
@@ -188,8 +164,6 @@ y = le.fit_transform(y)
 X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.3, random_state=42)
 
 #%%
-from imblearn.over_sampling import SMOTE
-
 smote = SMOTE(random_state=42)
 X_train, y_train = smote.fit_resample(X_train, y_train)
 
@@ -220,7 +194,6 @@ mlp.fit(X_train_selected, y_train)
 # Make predictions on the test data using the trained model
 y_pred = mlp.predict(X_test_selected)
 # Evaluate Model with Metrics Below
-from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_score
 # Model evaluation
 print(classification_report(y_test, y_pred))
 print(f'Accuracy: {accuracy_score(y_test, y_pred):.3f}')
@@ -229,8 +202,6 @@ print(f'Recall: {recall_score(y_test, y_pred):.3f}')
 print(f'F1-score: {f1_score(y_test, y_pred):.3f}')
 
 #  ROC AUC Metric
-from sklearn.metrics import roc_curve, auc
-import matplotlib.pyplot as plt
 fpr, tpr, thresholds = roc_curve(y_test, y_pred)
 # Calculate the AUC score
 roc_auc = auc(fpr, tpr)
@@ -282,7 +253,6 @@ print(f'Test accuracy: {test_acc:.3f}')
 print('Best parameters found:\n', clf.best_params_)
 
 y_pred = clf.predict(X_test_scaled)
-from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_score
 # Model evaluation
 print(classification_report(y_test, y_pred))
 print(f'Accuracy: {accuracy_score(y_test, y_pred):.3f}')
@@ -290,8 +260,6 @@ print(f'Precision: {precision_score(y_test, y_pred):.3f}')
 print(f'Recall: {recall_score(y_test, y_pred):.3f}')
 print(f'F1-score: {f1_score(y_test, y_pred):.3f}')
 #  ROC AUC Metric
-from sklearn.metrics import roc_curve, auc
-import matplotlib.pyplot as plt
 fpr, tpr, thresholds = roc_curve(y_test, y_pred)
 # Calculate the AUC score
 roc_auc = auc(fpr, tpr)
@@ -356,8 +324,6 @@ print(f'F1-score: {f1_score(y_test, y_pred):.3f}')
 
 #%%
 #  ROC AUC Metric
-from sklearn.metrics import roc_curve, auc
-import matplotlib.pyplot as plt
 fpr, tpr, thresholds = roc_curve(y_test, y_pred)
 # Calculate the AUC score
 roc_auc = auc(fpr, tpr)
@@ -374,9 +340,7 @@ plt.show()
 
 
 #%%
-
 # Keras Model
-from keras.wrappers.scikit_learn import KerasClassifier
 from keras.models import Sequential
 from keras.layers import Dense, Dropout
 # model architecture - simple model
@@ -402,7 +366,6 @@ plt.ylabel('Accuracy/Loss')
 plt.legend()
 plt.show()
 # Predict probabilities for test set
-from sklearn.metrics import auc
 y_pred_keras = model.predict(X_test_scaled)
 fpr_keras, tpr_keras, thresholds_keras = roc_curve(y_test, y_pred_keras)
 auc_keras = auc(fpr_keras, tpr_keras)
