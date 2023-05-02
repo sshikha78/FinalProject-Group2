@@ -7,11 +7,19 @@
     <list default="true" id="52c711c2-43ff-49e2-9555-a0268a987505" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Code/main.py" beforeDir="false" afterPath="$PROJECT_DIR$/Code/main.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Final-Group-Project-Report/Shikha_Individual Report.pdf" beforeDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
     <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="FileTemplateManagerImpl">
+    <option name="RECENT_TEMPLATES">
+      <list>
+        <option value="Python Script" />
+      </list>
+    </option>
   </component>
   <component name="Git.Settings">
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
@@ -76,7 +84,7 @@
       <workItem from="1682289373651" duration="2233000" />
       <workItem from="1682374352580" duration="509000" />
       <workItem from="1682380548143" duration="104000" />
-      <workItem from="1682971774534" duration="395000" />
+      <workItem from="1682971774534" duration="2347000" />
     </task>
     <servers />
   </component>
