@@ -33,6 +33,7 @@ from sklearn.metrics import plot_confusion_matrix
 from sklearn.model_selection import cross_val_score
 from sklearn.metrics import plot_roc_curve
 from sklearn.metrics import plot_confusion_matrix, plot_roc_curve
+
 df = pd.read_csv("healthcare-dataset-stroke-data.csv")
 #%%
 # Print the first 5 rows of the DataFrame
@@ -64,6 +65,26 @@ df['stroke'] = df['stroke'].astype(int)
 # PRE PROCESSING + EDA
 # Target feature - Stroke
 print("Value count in the stroke : \n",df['stroke'].value_counts())
+
+fig = df.hist(figsize=(10,8))
+plt.tight_layout()
+plt.show()
+categorical_cols = df.select_dtypes(include=['object']).columns
+print(categorical_cols)
+ncols = 3
+nrows = np.ceil(len(categorical_cols) / ncols).astype(int)
+fig, axs = plt.subplots(nrows=nrows, ncols=ncols, figsize=(16, 10), dpi=70)
+axs = axs.flatten()
+for i, col in enumerate(categorical_cols):
+    df[col].value_counts().plot(kind='bar', ax=axs[i])
+    axs[i].set_title(col, fontdict={'fontname': 'Serif', 'fontsize': 14, 'color': '#512b58'})
+    axs[i].set_xlabel("")
+    axs[i].set_ylabel("Count", fontdict={'fontname': 'Serif', 'fontsize': 14, 'color': '#512b58'})
+for i in range(len(categorical_cols), len(axs)):
+    fig.delaxes(axs[i])
+plt.tight_layout()
+plt.show()
+
 # Plot a bar chart of the stroke variable
 sns.countplot(x='stroke', data=df)
 plt.title('Stroke Counts')
